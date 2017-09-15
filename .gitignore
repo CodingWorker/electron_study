@@ -140,3 +140,10 @@ fabric.properties
 ## node
 **/node_modules
 
+##exe
+*.exe
+
+##OutApp
+**/OutApp
+
+
