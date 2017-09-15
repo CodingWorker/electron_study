@@ -1,0 +1,36 @@
+<h1>主进程调试</h1>
+<p>浏览器窗口的开发工具仅能调试渲染器的进程脚本（比如 web 页面）。为了提供一个可以调试主进程
+的方法，Electron 提供了 <code>--debug</code> 和 <code>--debug-brk</code> 开关。</p>
+<h2>命令行开关</h2>
+<p>使用如下的命令行开关来调试 Electron 的主进程：</p>
+<h3><code>--debug=[port]</code></h3>
+<p>当这个开关用于 Electron 时，它将会监听 V8 引擎中有关 <code>port</code> 的调试器协议信息。
+默认的 <code>port</code> 是 <code>5858</code>。</p>
+<h3><code>--debug-brk=[port]</code></h3>
+<p>就像 <code>--debug</code> 一样，但是会在第一行暂停脚本运行。</p>
+<h2>使用 node-inspector 来调试</h2>
+<p><strong>备注：</strong> Electron 目前对 node-inspector 支持的不是特别好，
+如果你通过 node-inspector 的 console 来检查 <code>process</code> 对象，主进程就会崩溃。</p>
+<h3>1. 确认你已经安装了 <a href="https://github.com/nodejs/node-gyp#installation">node-gyp 所需工具</a></h3>
+<h3>2. 安装 <a href="https://github.com/node-inspector/node-inspector">node-inspector</a></h3>
+<p><code>bash
+$ npm install node-inspector</code></p>
+<h3>3. 安装 <code>node-pre-gyp</code> 的一个修订版</h3>
+<p><code>bash
+$ npm install git+https://git@github.com/enlight/node-pre-gyp.git#detect-electron-runtime-in-find</code> </p>
+<h3>4. 为 Electron 重新编译 <code>node-inspector</code> <code>v8</code> 模块（将 target 参数修改为你的 Electron 的版本号）</h3>
+<p><code>bash
+$ node_modules/.bin/node-pre-gyp --target=0.36.2 --runtime=electron --fallback-to-build --directory node_modules/v8-debug/ --dist-url=https://atom.io/download/atom-shell reinstall
+$ node_modules/.bin/node-pre-gyp --target=0.36.2 --runtime=electron --fallback-to-build --directory node_modules/v8-profiler/ --dist-url=https://atom.io/download/atom-shell reinstall</code></p>
+<h3>5. 打开 Electron 的调试模式</h3>
+<p>你也可以用调试参数来运行 Electron ：</p>
+<p><code>bash
+$ electron --debug=5858 your/app</code></p>
+<p>或者，在第一行暂停你的脚本：</p>
+<p><code>bash
+$ electron --debug-brk=5858 your/app</code></p>
+<h3>6. 使用 Electron 开启 <a href="https://github.com/node-inspector/node-inspector">node-inspector</a> 服务</h3>
+<p><code>bash
+$ ELECTRON_RUN_AS_NODE=true path/to/electron.exe node_modules/node-inspector/bin/inspector.js</code></p>
+<h3>7. 加载调试器界面</h3>
+<p>在 Chrome 中打开 http://127.0.0.1:8080/debug?ws=127.0.0.1:8080&amp;port=5858</p>

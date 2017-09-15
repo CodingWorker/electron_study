@@ -1,0 +1,171 @@
+<h1>协议</h1>
+<p><code>protocol</code> 模块可以注册一个自定义协议，或者使用一个已经存在的协议.</p>
+<p>例子，使用一个与 <code>file://</code> 功能相似的协议 :</p>
+<p>```javascript
+const electron = require('electron');
+const app = electron.app;
+const path = require('path');</p>
+<p>app.on('ready', function() {
+    var protocol = electron.protocol;
+    protocol.registerFileProtocol('atom', function(request, callback) {
+      var url = request.url.substr(7);
+      callback({path: path.normalize(__dirname + '/' + url)});
+    }, function (error) {
+      if (error)
+        console.error('Failed to register protocol')
+    });
+});
+```</p>
+<p><strong>注意:</strong> 这个模块只有在 <code>app</code> 模块的 <code>ready</code> 事件触发之后才可使用.</p>
+<h2>方法</h2>
+<p><code>protocol</code> 模块有如下方法:</p>
+<h3><code>protocol.registerStandardSchemes(schemes)</code></h3>
+<ul>
+<li><code>schemes</code> Array - 将一个自定义的方案注册为标准的方案.</li>
+</ul>
+<p>一个标准的 <code>scheme</code> 遵循 RFC 3986 的
+<a href="https://tools.ietf.org/html/rfc3986#section-3">generic URI syntax</a> 标准. 这包含了 <code>file:</code> 和 <code>filesystem:</code>.</p>
+<h3><code>protocol.registerServiceWorkerSchemes(schemes)</code></h3>
+<ul>
+<li><code>schemes</code> Array - 将一个自定义的方案注册为处理 service workers.</li>
+</ul>
+<h3><code>protocol.registerFileProtocol(scheme, handler[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>handler</code> Function</li>
+<li><code>completion</code> Function (可选)</li>
+</ul>
+<p>注册一个协议，用来发送响应文件.当通过这个协议来发起一个请求的时候，将使用 <code>handler(request, callback)</code> 来调用
+<code>handler</code> .当 <code>scheme</code> 被成功注册或者完成(错误)时失败，将使用 <code>completion(null)</code> 调用 <code>completion</code>.</p>
+<ul>
+<li>
+<code>request</code> Object
+<ul>
+<li><code>url</code> String</li>
+<li><code>referrer</code> String</li>
+<li><code>method</code> String</li>
+<li><code>uploadData</code> Array (可选)</li>
+</ul>
+</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p><code>uploadData</code> 是一个 <code>data</code> 对象数组:</p>
+<ul>
+<li>
+<code>data</code> Object
+<ul>
+<li><code>bytes</code> Buffer - 被发送的内容.</li>
+<li><code>file</code> String - 上传的文件路径.</li>
+</ul>
+</li>
+</ul>
+<p>为了处理请求，调用 <code>callback</code> 时需要使用文件路径或者一个带 <code>path</code> 参数的对象, 例如 <code>callback(filePath)</code> 或
+<code>callback({path: filePath})</code>.</p>
+<p>当不使用任何参数调用 <code>callback</code> 时，你可以指定一个数字或一个带有 <code>error</code> 参数的对象，来标识 <code>request</code> 失败.你可以使用的 error number 可以参考 
+<a href="https://code.google.com/p/chromium/codesearch#chromium/src/net/base/net_error_list.h">net error list</a>.</p>
+<p>默认 <code>scheme</code> 会被注册为一个 <code>http:</code> 协议，它与遵循 &quot;generic URI syntax&quot; 规则的协议解析不同，例如 <code>file:</code> ，所以你或许应该调用 <code>protocol.registerStandardSchemes</code> 来创建一个标准的 scheme.</p>
+<h3><code>protocol.registerBufferProtocol(scheme, handler[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>handler</code> Function</li>
+<li><code>completion</code> Function (可选)</li>
+</ul>
+<p>注册一个 <code>scheme</code> 协议，用来发送响应 <code>Buffer</code> .</p>
+<p>这个方法的用法类似 <code>registerFileProtocol</code>，除非使用一个 <code>Buffer</code> 对象，或一个有 <code>data</code>,
+<code>mimeType</code>, 和 <code>charset</code> 属性的对象来调用 <code>callback</code> .</p>
+<p>例子:</p>
+<p><code>javascript
+protocol.registerBufferProtocol('atom', function(request, callback) {
+  callback({mimeType: 'text/html', data: new Buffer('&lt;h5&gt;Response&lt;/h5&gt;')});
+}, function (error) {
+  if (error)
+    console.error('Failed to register protocol')
+});</code></p>
+<h3><code>protocol.registerStringProtocol(scheme, handler[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>handler</code> Function</li>
+<li><code>completion</code> Function (可选)</li>
+</ul>
+<p>注册一个 <code>scheme</code> 协议，用来发送响应 <code>String</code> .</p>
+<p>这个方法的用法类似 <code>registerFileProtocol</code>，除非使用一个 <code>String</code> 对象，或一个有 <code>data</code>,
+<code>mimeType</code>, 和 <code>charset</code> 属性的对象来调用 <code>callback</code> .</p>
+<h3><code>protocol.registerHttpProtocol(scheme, handler[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>handler</code> Function</li>
+<li><code>completion</code> Function (可选)</li>
+</ul>
+<p>注册一个 <code>scheme</code> 协议，用来发送 HTTP 请求作为响应.</p>
+<p>这个方法的用法类似 <code>registerFileProtocol</code>，除非使用一个 <code>redirectRequest</code> 对象，或一个有 <code>url</code>, <code>method</code>,
+<code>referrer</code>, <code>uploadData</code> 和 <code>session</code> 属性的对象来调用 <code>callback</code> .</p>
+<ul>
+<li>
+<code>redirectRequest</code> Object
+<ul>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>session</code> Object (可选)</li>
+<li><code>uploadData</code> Object (可选)</li>
+</ul>
+</li>
+</ul>
+<p>默认这个 HTTP 请求会使用当前 session .如果你想使用不同的session值，你应该设置 <code>session</code> 为 <code>null</code>.</p>
+<p>POST 请求应当包含 <code>uploadData</code> 对象.</p>
+<ul>
+<li>
+<code>uploadData</code> object
+<ul>
+<li><code>contentType</code> String - 内容的 MIME type.</li>
+<li><code>data</code> String - 被发送的内容.</li>
+</ul>
+</li>
+</ul>
+<h3><code>protocol.unregisterProtocol(scheme[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>completion</code> Function (可选)</li>
+</ul>
+<p>注销自定义协议 <code>scheme</code>.</p>
+<h3><code>protocol.isProtocolHandled(scheme, callback)</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>将使用一个布尔值来调用 <code>callback</code> ，这个布尔值标识了是否已经存在 <code>scheme</code> 的句柄了.</p>
+<h3><code>protocol.interceptFileProtocol(scheme, handler[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>handler</code> Function</li>
+<li><code>completion</code> Function (可选)</li>
+</ul>
+<p>拦截 <code>scheme</code> 协议并且使用 <code>handler</code> 作为协议的新的句柄来发送响应文件.</p>
+<h3><code>protocol.interceptStringProtocol(scheme, handler[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>handler</code> Function</li>
+<li><code>completion</code> Function (可选)</li>
+</ul>
+<p>拦截 <code>scheme</code> 协议并且使用 <code>handler</code> 作为协议的新的句柄来发送响应 <code>String</code>.</p>
+<h3><code>protocol.interceptBufferProtocol(scheme, handler[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>handler</code> Function</li>
+<li><code>completion</code> Function (可选)</li>
+</ul>
+<p>拦截 <code>scheme</code> 协议并且使用 <code>handler</code> 作为协议的新的句柄来发送响应 <code>Buffer</code>.</p>
+<h3><code>protocol.interceptHttpProtocol(scheme, handler[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>handler</code> Function</li>
+<li><code>completion</code> Function (optional)</li>
+</ul>
+<p>拦截 <code>scheme</code> 协议并且使用 <code>handler</code> 作为协议的新的句柄来发送新的响应 HTTP 请求.
+Intercepts <code>scheme</code> protocol and uses <code>handler</code> as the protocol's new handler
+which sends a new HTTP request as a response.</p>
+<h3><code>protocol.uninterceptProtocol(scheme[, completion])</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+<li><code>completion</code> Function
+取消对 <code>scheme</code> 的拦截，使用它的原始句柄进行处理.</li>
+</ul>

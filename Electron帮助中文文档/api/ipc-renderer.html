@@ -1,0 +1,53 @@
+<h1>ipcRenderer</h1>
+<p><code>ipcRenderer</code> 模块是一个
+<a href="https://nodejs.org/api/events.html">EventEmitter</a> 类的实例. 它提供了有限的方法，你可以从渲染进程向主进程发送同步或异步消息. 也可以收到主进程的相应.</p>
+<p>查看 <a href="ipc-main.html">ipcMain</a> 代码例子.</p>
+<h2>消息监听</h2>
+<p><code>ipcRenderer</code>  模块有下列方法来监听事件:</p>
+<h3><code>ipcRenderer.on(channel, listener)</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>监听 <code>channel</code>, 当有新消息到达，使用 <code>listener(event, args...)</code> 调用 <code>listener</code> .</p>
+<h3><code>ipcRenderer.once(channel, listener)</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>为这个事件添加一个一次性 <code>listener</code> 函数.这个 <code>listener</code> 将在下一次有新消息被发送到 <code>channel</code> 的时候被请求调用，之后就被删除了.</p>
+<h3><code>ipcRenderer.removeListener(channel, listener)</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>从指定的 <code>channel</code> 中的监听者数组删除指定的 <code>listener</code> .</p>
+<h3><code>ipcRenderer.removeAllListeners([channel])</code></h3>
+<ul>
+<li><code>channel</code> String (optional)</li>
+</ul>
+<p>删除所有的监听者，或者删除指定 <code>channel</code> 中的全部.</p>
+<h2>发送消息</h2>
+<p><code>ipcRenderer</code> 模块有如下方法来发送消息:</p>
+<h3><code>ipcRenderer.send(channel[, arg1][, arg2][, ...])</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>arg</code> (可选)</li>
+</ul>
+<p>通过 <code>channel</code> 向主进程发送异步消息，也可以发送任意参数.参数会被JSON序列化，之后就不会包含函数或原型链.</p>
+<p>主进程通过使用 <code>ipcMain</code> 模块来监听 <code>channel</code>，从而处理消息.</p>
+<h3><code>ipcRenderer.sendSync(channel[, arg1][, arg2][, ...])</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>arg</code> (可选)</li>
+</ul>
+<p>通过 <code>channel</code> 向主进程发送同步消息，也可以发送任意参数.参数会被JSON序列化，之后就不会包含函数或原型链.</p>
+<p>主进程通过使用 <code>ipcMain</code> 模块来监听 <code>channel</code>，从而处理消息,
+通过 <code>event.returnValue</code> 来响应.</p>
+<p><strong>注意:</strong> 发送同步消息将会阻塞整个渲染进程,除非你知道你在做什么，否则就永远不要用它 .</p>
+<h3><code>ipcRenderer.sendToHost(channel[, arg1][, arg2][, ...])</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>arg</code> (可选)</li>
+</ul>
+<p>类似 <code>ipcRenderer.send</code> ，但是它的事件将发往 host page 的 <code>&lt;webview&gt;</code> 元素，而不是主进程.</p>

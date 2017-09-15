@@ -1,0 +1,81 @@
+<h1>Build Instructions (Windows)</h1>
+<p>遵循下面的引导，在 Windows 上构建 Electron .</p>
+<h2>前提</h2>
+<ul>
+<li>Windows 7 / Server 2008 R2 or higher</li>
+<li>Visual Studio 2013 with Update 4 - <a href="https://www.visualstudio.com/news/vs2013-community-vs">download VS 2013 Community Edition for
+  free</a>.</li>
+<li><a href="http://www.python.org/download/releases/2.7/">Python 2.7</a></li>
+<li><a href="http://nodejs.org/download/">Node.js</a></li>
+<li><a href="http://git-scm.com">Git</a></li>
+</ul>
+<p>如果你现在还没有安装 Windows , <a href="https://www.modern.ie/en-us/virtualization-tools#downloads">modern.ie</a> 有一个 timebombed 版本的 Windows ，你可以用它来构建 Electron.</p>
+<p>构建 Electron 完全的依赖于命令行，并且不可通过 Visual Studio.
+可以使用任何的编辑器来开发 Electron ，未来会支持 Visual Studio.</p>
+<p><strong>注意:</strong> 虽然 Visual Studio 不是用来构建的，但是它仍然
+<strong>必须的</strong> ，因为我们需要它提供的构建工具栏.</p>
+<p><strong>注意:</strong> Visual Studio 2015 不可用. 请确定使用 MSVS
+<strong>2013</strong>.</p>
+<h2>获取代码</h2>
+<p><code>powershell
+$ git clone https://github.com/atom/electron.git</code></p>
+<h2>Bootstrapping</h2>
+<p>bootstrap 脚本也是必要下载的构建依赖，来创建项目文件.注意我们使用的是 <code>ninja</code> 来构建 Electron，所以没有生成 Visual Studio 项目.</p>
+<p><code>powershell
+$ cd electron
+$ python script\bootstrap.py -v</code></p>
+<h2>构建</h2>
+<p>创建 <code>Release</code> 、 <code>Debug</code> target:</p>
+<p><code>powershell
+$ python script\build.py</code></p>
+<p>可以只创建 <code>Debug</code> target:</p>
+<p><code>powershell
+$ python script\build.py -c D</code></p>
+<p>创建完毕, 可以在 <code>out/D</code>(debug target) 或 <code>out\R</code> (release target) 下面找到 <code>electron.exe</code>.</p>
+<h2>64bit Build</h2>
+<p>为了构建64位的 target,在运行 bootstrap 脚本的时候需要使用 <code>--target_arch=x64</code> :</p>
+<p><code>powershell
+$ python script\bootstrap.py -v --target_arch=x64</code></p>
+<p>其他构建步骤完全相同.</p>
+<h2>Tests</h2>
+<p>测试你的修改是否符合项目代码风格，使用:</p>
+<p><code>powershell
+$ python script\cpplint.py</code></p>
+<p>测试有效性使用:</p>
+<p><code>powershell
+$ python script\test.py</code>
+在构建 debug 时为 Tests包含原生模块 (例如 <code>runas</code>) 将不会执行(详情 <a href="https://github.com/atom/electron/issues/2558">#2558</a>), 但是它们在构建 release 会起效.</p>
+<p>运行 release 构建使用 :</p>
+<p><code>powershell
+$ python script\test.py -R</code></p>
+<h2>解决问题</h2>
+<h3>Command xxxx not found</h3>
+<p>如果你遇到了一个错误，类似 <code>Command xxxx not found</code>, 可以尝试使用 <code>VS2012 Command Prompt</code> 控制台来执行构建脚本 .</p>
+<h3>Fatal internal compiler error: C1001</h3>
+<p>确保你已经安装了 Visual Studio 的最新安装包 .</p>
+<h3>Assertion failed: ((handle))-&gt;activecnt &gt;= 0</h3>
+<p>如果在 Cygwin 下构建的，你可能会看到 <code>bootstrap.py</code> 失败并且附带下面错误 :</p>
+<p>```
+Assertion failed: ((handle))-&gt;activecnt &gt;= 0, file src\win\pipe.c, line 1430</p>
+<p>Traceback (most recent call last):
+  File &quot;script/bootstrap.py&quot;, line 87, in <module>
+    sys.exit(main())
+  File &quot;script/bootstrap.py&quot;, line 22, in main
+    update<em>node</em>modules('.')
+  File &quot;script/bootstrap.py&quot;, line 56, in update<em>node</em>modules
+    execute([NPM, 'install'])
+  File &quot;/home/zcbenz/codes/raven/script/lib/util.py&quot;, line 118, in execute
+    raise e
+subprocess.CalledProcessError: Command '['npm.cmd', 'install']' returned non-zero exit status 3
+```</p>
+<p>这是由同时使用 Cygwin Python 和 Win32 Node 造成的 bug.解决办法就是使用 Win32 Python 执行 bootstrap 脚本 (假定你已经在目录 <code>C:\Python27</code> 下安装了 Python):</p>
+<p><code>powershell
+$ /cygdrive/c/Python27/python.exe script/bootstrap.py</code></p>
+<h3>LNK1181: cannot open input file 'kernel32.lib'</h3>
+<p>重新安装 32位的 Node.js.</p>
+<h3>Error: ENOENT, stat 'C:\Users\USERNAME\AppData\Roaming\npm'</h3>
+<p>简单创建目录 <a href="http://stackoverflow.com/a/25095327/102704">应该可以解决问题</a>:</p>
+<p><code>powershell
+$ mkdir ~\AppData\Roaming\npm</code></p>
+<h3>node-gyp is not recognized as an internal or external command</h3>
+<p>如果你使用 Git Bash 来构建，或许会遇到这个错误，可以使用 PowerShell 或 VS2012 Command Prompt 来代替 .</p>

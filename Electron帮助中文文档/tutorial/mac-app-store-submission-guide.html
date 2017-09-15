@@ -1,0 +1,108 @@
+<h1>Mac App Store 应用提交向导</h1>
+<p>自从 v0.34.0, Electron 就允许提交应用包到 Mac App Store
+(MAS) . 这个向导提供的信息有 : 如何提交应用和 MAS 构建的限制.</p>
+<p><strong>注意:</strong> 从 v0.36.0，当应用成为沙箱之后，会有一个 bug 阻止 GPU 进程开启 , 所以在这个 bug 修复之前，建议使用 v0.35.x .更多查看 <a href="https://github.com/atom/electron/issues/3871">issue #3871</a> .</p>
+<p><strong>注意:</strong> 提交应用到 Mac App Store 需要参加  <a href="https://developer.apple.com/support/compare-memberships/">Apple Developer
+Program</a> , 这需要花钱.</p>
+<h2>如何提交</h2>
+<p>下面步骤介绍了一个简单的提交应用到商店方法.然而，这些步骤不能保证你的应用被 Apple 接受；你仍然需要阅读 Apple 的 <a href="https://developer.apple.com/library/mac/documentation/IDEs/Conceptual/AppDistributionGuide/SubmittingYourApp/SubmittingYourApp.html">Submitting Your App</a> 关于如何满足 Mac App Store 要求的向导.</p>
+<h3>获得证书</h3>
+<p>为了提交应用到商店，首先需要从 Apple 获得一个证书.可以遵循  <a href="https://github.com/nwjs/nw.js/wiki/Mac-App-Store-%28MAS%29-Submission-Guideline#first-steps">existing guides</a>.</p>
+<h3>App 签名</h3>
+<p>获得证书之后，你可以使用 <a href="application-distribution.html">Application Distribution</a> 打包你的应用, 然后前往提交你的应用.这个步骤基本上和其他程序一样，但是这 key 一个个的标识 Electron 的每个依赖.</p>
+<p>首先，你需要准备2个授权文件 .</p>
+<p><code>child.plist</code>:</p>
+<p><code>xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+  &lt;dict&gt;
+    &lt;key&gt;com.apple.security.app-sandbox&lt;/key&gt;
+    &lt;true/&gt;
+    &lt;key&gt;com.apple.security.inherit&lt;/key&gt;
+    &lt;true/&gt;
+  &lt;/dict&gt;
+&lt;/plist&gt;</code></p>
+<p><code>parent.plist</code>:</p>
+<p><code>xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+  &lt;dict&gt;
+    &lt;key&gt;com.apple.security.app-sandbox&lt;/key&gt;
+    &lt;true/&gt;
+  &lt;/dict&gt;
+&lt;/plist&gt;</code></p>
+<p>然后使用下面的脚本标识你的应用 :</p>
+<p>```bash</p>
+<h1>!/bin/bash</h1>
+<h1>Name of your app.</h1>
+<p>APP=&quot;YourApp&quot;</p>
+<h1>The path of you app to sign.</h1>
+<p>APP_PATH=&quot;/path/to/YouApp.app&quot;</p>
+<h1>The path to the location you want to put the signed package.</h1>
+<p>RESULT_PATH=&quot;~/Desktop/$APP.pkg&quot;</p>
+<h1>The name of certificates you requested.</h1>
+<p>APP<em>KEY=&quot;3rd Party Mac Developer Application: Company Name (APPIDENTITY)&quot;
+INSTALLER</em>KEY=&quot;3rd Party Mac Developer Installer: Company Name (APPIDENTITY)&quot;</p>
+<p>FRAMEWORKS<em>PATH=&quot;$APP</em>PATH/Contents/Frameworks&quot;</p>
+<p>codesign --deep -fs &quot;$APP<em>KEY&quot; --entitlements child.plist &quot;$FRAMEWORKS</em>PATH/Electron Framework.framework/Versions/A&quot;
+codesign --deep -fs &quot;$APP<em>KEY&quot; --entitlements child.plist &quot;$FRAMEWORKS<em>PATH/$APP Helper.app/&quot;
+codesign --deep -fs &quot;$APP</em>KEY&quot; --entitlements child.plist &quot;$FRAMEWORKS</em>PATH/$APP Helper EH.app/&quot;
+codesign --deep -fs &quot;$APP<em>KEY&quot; --entitlements child.plist &quot;$FRAMEWORKS</em>PATH/$APP Helper NP.app/&quot;
+if [ -d &quot;$FRAMEWORKS_PATH/Squirrel.framework/Versions/A&quot; ]; then
+  # Signing a non-MAS build.
+  codesign --deep -fs &quot;$APP<em>KEY&quot; --entitlements child.plist &quot;$FRAMEWORKS</em>PATH/Mantle.framework/Versions/A&quot;
+  codesign --deep -fs &quot;$APP<em>KEY&quot; --entitlements child.plist &quot;$FRAMEWORKS<em>PATH/ReactiveCocoa.framework/Versions/A&quot;
+  codesign --deep -fs &quot;$APP</em>KEY&quot; --entitlements child.plist &quot;$FRAMEWORKS</em>PATH/Squirrel.framework/Versions/A&quot;
+fi
+codesign -fs &quot;$APP<em>KEY&quot; --entitlements parent.plist &quot;$APP</em>PATH&quot;</p>
+<p>productbuild --component &quot;$APP<em>PATH&quot; /Applications --sign &quot;$INSTALLER</em>KEY&quot; &quot;$RESULT_PATH&quot;
+```
+如果你是 OS X 下的应用沙箱使用新手，应当仔细阅读 Apple 的 <a href="https://developer.apple.com/library/ios/documentation/Miscellaneous/Reference/EntitlementKeyReference/Chapters/EnablingAppSandbox.html">Enabling App Sandbox</a> 来有一点基础,然后向授权文件添加你的应用需要的许可 keys .</p>
+<h3>上传你的应用并检查提交</h3>
+<p>在签名应用之后，可以使用应用 Loader 来上传到 iTunes 链接处理 , 确保在上传之前你已经 <a href="https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/CreatingiTunesConnectRecord.html">created a record</a>. 然后你能 <a href="https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/SubmittingTheApp.html">submit your app for review</a>.</p>
+<h2>MAS构建限制</h2>
+<p>为了让你的应用沙箱满足所有条件，在 MAS 构建的时候，下面的模块被禁用了 :</p>
+<ul>
+<li><code>crashReporter</code></li>
+<li><code>autoUpdater</code></li>
+</ul>
+<p>并且下面的行为也改变了:</p>
+<ul>
+<li>一些机子的视频采集功能无效.</li>
+<li>某些特征不可访问.</li>
+<li>Apps 不可识别 DNS 改变.</li>
+</ul>
+<p>也由于应用沙箱的使用方法，应用可以访问的资源被严格限制了 ; 阅读更多信息 <a href="https://developer.apple.com/app-sandboxing/">App Sandboxing</a> .</p>
+<h2>Electron 使用的加密算法</h2>
+<p>取决于你所在地方的国家和地区 , Mac App Store 或许需要记录你应用的加密算法 , 甚至要求你提交一个 U.S 加密注册(ERN) 许可的复印件.</p>
+<p>Electron 使用下列加密算法:</p>
+<ul>
+<li>AES - <a href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">NIST SP 800-38A</a>, <a href="http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf">NIST SP 800-38D</a>, <a href="http://www.ietf.org/rfc/rfc3394.txt">RFC 3394</a></li>
+<li>HMAC - <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">FIPS 198-1</a></li>
+<li>ECDSA - ANS X9.62–2005</li>
+<li>ECDH - ANS X9.63–2001</li>
+<li>HKDF - <a href="http://csrc.nist.gov/publications/nistpubs/800-56C/SP-800-56C.pdf">NIST SP 800-56C</a></li>
+<li>PBKDF2 - <a href="https://tools.ietf.org/html/rfc2898">RFC 2898</a></li>
+<li>RSA - <a href="http://www.ietf.org/rfc/rfc3447">RFC 3447</a></li>
+<li>SHA - <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">FIPS 180-4</a></li>
+<li>Blowfish - https://www.schneier.com/cryptography/blowfish/</li>
+<li>CAST - <a href="https://tools.ietf.org/html/rfc2144">RFC 2144</a>, <a href="https://tools.ietf.org/html/rfc2612">RFC 2612</a></li>
+<li>DES - <a href="http://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf">FIPS 46-3</a></li>
+<li>DH - <a href="https://tools.ietf.org/html/rfc2631">RFC 2631</a></li>
+<li>DSA - <a href="http://webstore.ansi.org/RecordDetail.aspx?sku=ANSI+X9.30-1%3A1997">ANSI X9.30</a></li>
+<li>EC - <a href="http://www.secg.org/sec1-v2.pdf">SEC 1</a></li>
+<li>IDEA - &quot;On the Design and Security of Block Ciphers&quot; book by X. Lai</li>
+<li>MD2 - <a href="http://tools.ietf.org/html/rfc1319">RFC 1319</a></li>
+<li>MD4 - <a href="https://tools.ietf.org/html/rfc6150">RFC 6150</a></li>
+<li>MD5 - <a href="https://tools.ietf.org/html/rfc1321">RFC 1321</a></li>
+<li>MDC2 - <a href="https://www.openssl.org/docs/manmaster/crypto/mdc2.html">ISO/IEC 10118-2</a></li>
+<li>RC2 - <a href="https://tools.ietf.org/html/rfc2268">RFC 2268</a></li>
+<li>RC4 - <a href="https://tools.ietf.org/html/rfc4345">RFC 4345</a></li>
+<li>RC5 - http://people.csail.mit.edu/rivest/Rivest-rc5rev.pdf</li>
+<li>RIPEMD - <a href="http://webstore.ansi.org/RecordDetail.aspx?sku=ISO%2FIEC%2010118-3:2004">ISO/IEC 10118-3</a></li>
+</ul>
+<p>如何获取 ERN 许可, 可看这篇文章: <a href="https://carouselapps.com/2015/12/15/legally-submit-app-apples-app-store-uses-encryption-obtain-ern/">How to legally
+submit an app to Apple’s App Store when it uses encryption (or how to obtain an
+ERN)</a>.</p>

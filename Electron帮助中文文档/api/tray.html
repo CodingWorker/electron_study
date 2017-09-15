@@ -1,0 +1,190 @@
+<h1>Tray</h1>
+<p>用一个 <code>Tray</code> 来表示一个图标,这个图标处于正在运行的系统的通知区 ，通常被添加到一个 context menu 上.</p>
+<p>```javascript
+const electron = require('electron');
+const app = electron.app;
+const Menu = electron.Menu;
+const Tray = electron.Tray;</p>
+<p>var appIcon = null;
+app.on('ready', function(){
+  appIcon = new Tray('/path/to/my/icon');
+  var contextMenu = Menu.buildFromTemplate([
+    { label: 'Item1', type: 'radio' },
+    { label: 'Item2', type: 'radio' },
+    { label: 'Item3', type: 'radio', checked: true },
+    { label: 'Item4', type: 'radio' }
+  ]);
+  appIcon.setToolTip('This is my application.');
+  appIcon.setContextMenu(contextMenu);
+});</p>
+<p>```</p>
+<p><strong>平台限制:</strong></p>
+<ul>
+<li>在 Linux， 如果支持应用指示器则使用它，否则使用 <code>GtkStatusIcon</code> 代替.</li>
+<li>在 Linux ，配置了只有有了应用指示器的支持, 你必须安装 <code>libappindicator1</code> 来让 tray icon 执行.</li>
+<li>应用指示器只有在它拥有 context menu 时才会显示.</li>
+<li>当在linux 上使用了应用指示器，将忽略点击事件.</li>
+<li>在 Linux，为了让单独的 <code>MenuItem</code> 起效，需要再次调用 <code>setContextMenu</code> .例如:</li>
+</ul>
+<p><code>javascript
+contextMenu.items[2].checked = false;
+appIcon.setContextMenu(contextMenu);</code>
+如果想在所有平台保持完全相同的行为，不应该依赖点击事件，而是一直将一个 context menu 添加到 tray icon.</p>
+<h2>Class: Tray</h2>
+<p><code>Tray</code> 是一个 <a href="http://nodejs.org/api/events.html#events_class_events_eventemitter">事件发出者</a>.</p>
+<h3><code>new Tray(image)</code></h3>
+<ul>
+<li><code>image</code> <a href="native-image.html">NativeImage</a></li>
+</ul>
+<p>创建一个与 <code>image</code> 相关的 icon.</p>
+<h2>事件</h2>
+<p><code>Tray</code> 模块可发出下列事件:</p>
+<p><strong>注意:</strong> 一些事件只能在特定的os中运行，已经标明.</p>
+<h3>Event: 'click'</h3>
+<ul>
+<li>
+<code>event</code> Event
+<ul>
+<li><code>altKey</code> Boolean</li>
+<li><code>shiftKey</code> Boolean</li>
+<li><code>ctrlKey</code> Boolean</li>
+<li><code>metaKey</code> Boolean</li>
+</ul>
+</li>
+<li>
+<code>bounds</code> Object - tray icon 的 bounds.
+<ul>
+<li><code>x</code> Integer</li>
+<li><code>y</code> Integer</li>
+<li><code>width</code> Integer</li>
+<li><code>height</code> Integer</li>
+</ul>
+</li>
+</ul>
+<p>当tray icon被点击的时候发出事件.</p>
+<p><strong>注意:</strong> <code>bounds</code> 只在 OS X 和 Windows 上起效.</p>
+<h3>Event: 'right-click' <em>OS X</em> <em>Windows</em></h3>
+<ul>
+<li>
+<code>event</code> Event
+<ul>
+<li><code>altKey</code> Boolean</li>
+<li><code>shiftKey</code> Boolean</li>
+<li><code>ctrlKey</code> Boolean</li>
+<li><code>metaKey</code> Boolean</li>
+</ul>
+</li>
+<li>
+<code>bounds</code> Object - tray icon 的 bounds.
+<ul>
+<li><code>x</code> Integer</li>
+<li><code>y</code> Integer</li>
+<li><code>width</code> Integer</li>
+<li><code>height</code> Integer</li>
+</ul>
+</li>
+</ul>
+<p>当tray icon被鼠标右键点击的时候发出事件.</p>
+<h3>Event: 'double-click' <em>OS X</em> <em>Windows</em></h3>
+<ul>
+<li>
+<code>event</code> Event
+<ul>
+<li><code>altKey</code> Boolean</li>
+<li><code>shiftKey</code> Boolean</li>
+<li><code>ctrlKey</code> Boolean</li>
+<li><code>metaKey</code> Boolean</li>
+</ul>
+</li>
+<li>
+<code>bounds</code> Object - tray icon 的 bounds.
+<ul>
+<li><code>x</code> Integer</li>
+<li><code>y</code> Integer</li>
+<li><code>width</code> Integer</li>
+<li><code>height</code> Integer</li>
+</ul>
+</li>
+</ul>
+<p>当tray icon被双击的时候发出事件.</p>
+<h3>Event: 'balloon-show' <em>Windows</em></h3>
+<p>当tray 气泡显示的时候发出事件.</p>
+<h3>Event: 'balloon-click' <em>Windows</em></h3>
+<p>当tray 气泡被点击的时候发出事件.</p>
+<h3>Event: 'balloon-closed' <em>Windows</em></h3>
+<p>当tray 气泡关闭的时候发出事件，因为超时或人为关闭.</p>
+<h3>Event: 'drop' <em>OS X</em></h3>
+<p>当tray icon上的任何可拖动项被删除的时候发出事件.</p>
+<h3>Event: 'drop-files' <em>OS X</em></h3>
+<ul>
+<li><code>event</code></li>
+<li><code>files</code> Array - 已删除文件的路径.</li>
+</ul>
+<p>当tray icon上的可拖动文件被删除的时候发出事件.</p>
+<h3>Event: 'drag-enter' <em>OS X</em></h3>
+<p>当一个拖动操作进入tray icon的时候发出事件.</p>
+<h3>Event: 'drag-leave' <em>OS X</em></h3>
+<p>当一个拖动操作离开tray icon的时候发出事件.
+Emitted when a drag operation exits the tray icon.</p>
+<h3>Event: 'drag-end' <em>OS X</em></h3>
+<p>当一个拖动操作在tray icon上或其它地方停止拖动的时候发出事件.</p>
+<h2>方法</h2>
+<p><code>Tray</code> 模块有以下方法:</p>
+<p><strong>Note:</strong> 一些方法只能在特定的os中运行，已经标明.</p>
+<h3><code>Tray.destroy()</code></h3>
+<p>立刻删除 tray icon.</p>
+<h3><code>Tray.setImage(image)</code></h3>
+<ul>
+<li><code>image</code> <a href="native-image.html">NativeImage</a></li>
+</ul>
+<p>让 <code>image</code> 与 tray icon 关联起来.</p>
+<h3><code>Tray.setPressedImage(image)</code> <em>OS X</em></h3>
+<ul>
+<li><code>image</code> <a href="native-image.html">NativeImage</a></li>
+</ul>
+<p>当在 OS X 上按压 tray icon 的时候， 让 <code>image</code> 与 tray icon 关联起来.</p>
+<h3><code>Tray.setToolTip(toolTip)</code></h3>
+<ul>
+<li><code>toolTip</code> String</li>
+</ul>
+<p>为 tray icon 设置 hover text.</p>
+<h3><code>Tray.setTitle(title)</code> <em>OS X</em></h3>
+<ul>
+<li><code>title</code> String</li>
+</ul>
+<p>在状态栏沿着 tray icon 设置标题.</p>
+<h3><code>Tray.setHighlightMode(highlight)</code> <em>OS X</em></h3>
+<ul>
+<li><code>highlight</code> Boolean</li>
+</ul>
+<p>当 tray icon 被点击的时候，是否设置它的背景色变为高亮(blue).默认为 true.</p>
+<h3><code>Tray.displayBalloon(options)</code> <em>Windows</em></h3>
+<ul>
+<li>
+<code>options</code> Object
+<ul>
+<li><code>icon</code> <a href="native-image.html">NativeImage</a></li>
+<li><code>title</code> String</li>
+<li><code>content</code> String</li>
+</ul>
+</li>
+</ul>
+<p>展示一个 tray balloon.</p>
+<h3><code>Tray.popUpContextMenu([menu, position])</code> <em>OS X</em> <em>Windows</em></h3>
+<ul>
+<li><code>menu</code> Menu (optional)</li>
+<li>
+<code>position</code> Object (可选) - 上托位置.
+<ul>
+<li><code>x</code> Integer</li>
+<li><code>y</code> Integer</li>
+</ul>
+</li>
+</ul>
+<p>从 tray icon 上托出 context menu . 当划过 <code>menu</code> 的时候， <code>menu</code> 显示，代替 tray 的 context menu .</p>
+<p><code>position</code> 只在 windows 上可用，默认为 (0, 0) .</p>
+<h3><code>Tray.setContextMenu(menu)</code></h3>
+<ul>
+<li><code>menu</code> Menu</li>
+</ul>
+<p>为这个 icon 设置 context menu .</p>

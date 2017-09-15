@@ -1,0 +1,41 @@
+<h1>简介</h1>
+<p>所有的<a href="http://nodejs.org/api/">Node.js's built-in modules</a>在Electron中都可用，并且所有的node的第三方组件也可以放心使用（包括<a href="https://github.com/heyunjiang/electron/blob/master/docs/tutorial/using-native-node-modules.html">自身的模块</a>）。</p>
+<p>Electron也提供了一些额外的内置组件来开发传统桌面应用。一些组件只可以在主进程中使用，一些只可以在渲染进程中使用，但是也有部分可以在这2种进程中都可使用。</p>
+<p>基本规则：GUI模块或者系统底层的模块只可以在主进程中使用。要使用这些模块，你应当很熟悉<a href="https://github.com/heyunjiang/electron/blob/master/docs/tutorial/quick-start.md#the-main-process">主进程vs渲染进程</a>脚本的概念。</p>
+<p>主进程脚本看起来像个普通的nodejs脚本</p>
+<p>```javascript
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;</p>
+<p>var window = null;</p>
+<p>app.on('ready', function() {
+  window = new BrowserWindow({width: 800, height: 600});
+  window.loadURL('https://github.com');
+});
+```</p>
+<p>渲染进程和传统的web界面一样，除了它具有使用node模块的能力：</p>
+<p>```html
+&lt;!DOCTYPE html&gt;
+<html>
+<body></p>
+<script>
+  const remote = require('electron').remote;
+  console.log(remote.app.getVersion());
+</script>
+<p></body>
+</html>
+```</p>
+<p>如果想运行应用，参考 <code>Run your app</code> 。</p>
+<h2>解构任务</h2>
+<p>如果你使用的是CoffeeScript或Babel，你可以使用<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">destructuring assignment</a>来让使用内置模块更简单:</p>
+<p><code>javascript
+const {app, BrowserWindow} = require('electron');</code></p>
+<p>然而如果你使用的是普通的JavaScript，你就需要等到Chrome支持ES6了。</p>
+<h2>使用内置模块时禁用旧样式</h2>
+<p>在版本v0.35.0之前，所有的内置模块都需要按造 <code>require('module-name')</code> 形式来使用，虽然它有很多<a href="https://github.com/atom/electron/issues/387">弊端</a>，我们仍然在老的应用中友好的支持它。</p>
+<p>为了完整的禁用旧样式，你可以设置环境变量 <code>ELECTRON_HIDE_INTERNAL_MODULES</code> :</p>
+<p><code>javascript
+process.env.ELECTRON_HIDE_INTERNAL_MODULES = 'true'</code></p>
+<p>或者调用 <code>hideInternalModules</code> API:</p>
+<p><code>javascript
+require('electron').hideInternalModules()</code></p>

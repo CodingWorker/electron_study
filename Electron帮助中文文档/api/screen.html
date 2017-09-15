@@ -1,0 +1,117 @@
+<h1>screen</h1>
+<p><code>screen</code> 模块检索屏幕的 size，显示，鼠标位置等的信息.在 <code>app</code> 模块的<code>ready</code> 事件触发之前不可使用这个模块.</p>
+<p><code>screen</code> 是一个 <a href="http://nodejs.org/api/events.html#events_class_events_eventemitter">EventEmitter</a>.</p>
+<p><strong>注意:</strong> 在渲染进程 / 开发者工具栏, <code>window.screen</code> 是一个预设值的 DOM
+属性, 所以这样写 <code>var screen = require('electron').screen</code> 将不会工作.
+在我们下面的例子, 我们取代使用可变名字的 <code>electronScreen</code>.
+一个例子，创建一个充满真个屏幕的窗口 :</p>
+<p>```javascript
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;</p>
+<p>var mainWindow;</p>
+<p>app.on('ready', function() {
+  var electronScreen = electron.screen;
+  var size = electronScreen.getPrimaryDisplay().workAreaSize;
+  mainWindow = new BrowserWindow({ width: size.width, height: size.height });
+});
+```</p>
+<p>另一个例子，在次页外创建一个窗口:</p>
+<p>```javascript
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;</p>
+<p>var mainWindow;</p>
+<p>app.on('ready', function() {
+  var electronScreen = electron.screen;
+  var displays = electronScreen.getAllDisplays();
+  var externalDisplay = null;
+  for (var i in displays) {
+    if (displays[i].bounds.x != 0 || displays[i].bounds.y != 0) {
+      externalDisplay = displays[i];
+      break;
+    }
+  }</p>
+<p>if (externalDisplay) {
+    mainWindow = new BrowserWindow({
+      x: externalDisplay.bounds.x + 50,
+      y: externalDisplay.bounds.y + 50
+    });
+  }
+});
+```</p>
+<h2><code>Display</code> 对象</h2>
+<p><code>Display</code> 对象表示了物力方式连接系统. 一个伪造的 <code>Display</code> 或许存在于一个无头系统中，或者一个 <code>Display</code> 相当于一个远程的、虚拟的 display.</p>
+<ul>
+<li>
+<code>display</code> object
+<ul>
+<li><code>id</code> Integer - 与display 相关的唯一性标志.</li>
+<li><code>rotation</code> Integer - 可以是 0, 1, 2, 3, 每个代表了屏幕旋转的度数 0, 90, 180, 270.</li>
+<li><code>scaleFactor</code> Number - Output device's pixel scale factor.</li>
+<li><code>touchSupport</code> String - 可以是 <code>available</code>, <code>unavailable</code>, <code>unknown</code>.</li>
+<li><code>bounds</code> Object</li>
+<li><code>size</code> Object</li>
+<li><code>workArea</code> Object</li>
+<li><code>workAreaSize</code> Object</li>
+</ul>
+</li>
+</ul>
+<h2>事件</h2>
+<p><code>screen</code> 模块有如下事件:</p>
+<h3>Event: 'display-added'</h3>
+<p>返回:</p>
+<ul>
+<li><code>event</code> Event</li>
+<li><code>newDisplay</code> Object</li>
+</ul>
+<p>当添加了 <code>newDisplay</code> 时发出事件</p>
+<h3>Event: 'display-removed'</h3>
+<p>返回:</p>
+<ul>
+<li><code>event</code> Event</li>
+<li><code>oldDisplay</code> Object</li>
+</ul>
+<p>当移出了 <code>oldDisplay</code> 时发出事件</p>
+<h3>Event: 'display-metrics-changed'</h3>
+<p>返回:</p>
+<ul>
+<li><code>event</code> Event</li>
+<li><code>display</code> Object</li>
+<li><code>changedMetrics</code> Array</li>
+</ul>
+<p>当一个 <code>display</code> 中的一个或更多的 metrics 改变时发出事件.
+<code>changedMetrics</code> 是一个用来描述这个改变的数组.可能的变化为  <code>bounds</code>,
+<code>workArea</code>, <code>scaleFactor</code> 和 <code>rotation</code>.</p>
+<h2>方法</h2>
+<p><code>screen</code> 模块有如下方法:</p>
+<h3><code>screen.getCursorScreenPoint()</code></h3>
+<p>返回当前鼠标的绝对路径 .</p>
+<h3><code>screen.getPrimaryDisplay()</code></h3>
+<p>返回最主要的 display.</p>
+<h3><code>screen.getAllDisplays()</code></h3>
+<p>返回一个当前可用的 display 数组.</p>
+<h3><code>screen.getDisplayNearestPoint(point)</code></h3>
+<ul>
+<li>
+<code>point</code> Object
+<ul>
+<li><code>x</code> Integer</li>
+<li><code>y</code> Integer</li>
+</ul>
+</li>
+</ul>
+<p>返回离指定点最近的 display.</p>
+<h3><code>screen.getDisplayMatching(rect)</code></h3>
+<ul>
+<li>
+<code>rect</code> Object
+<ul>
+<li><code>x</code> Integer</li>
+<li><code>y</code> Integer</li>
+<li><code>width</code> Integer</li>
+<li><code>height</code> Integer</li>
+</ul>
+</li>
+</ul>
+<p>返回与提供的边界范围最密切相关的 display.</p>

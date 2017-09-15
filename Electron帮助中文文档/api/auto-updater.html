@@ -1,0 +1,51 @@
+<h1>autoUpdater</h1>
+<p>这个模块提供了一个到 <code>Squirrel</code> 自动更新框架的接口。</p>
+<h2>平台相关的提示</h2>
+<p>虽然 <code>autoUpdater</code> 模块提供了一套各平台通用的接口，但是在每个平台间依然会有一些微小的差异。</p>
+<h3>OS X</h3>
+<p>在 OS X 上，<code>autoUpdater</code> 模块依靠的是内置的 <a href="https://github.com/Squirrel/Squirrel.Mac">Squirrel.Mac</a>，这意味着你不需要依靠其他的设置就能使用。关于
+更新服务器的配置，你可以通过阅读 <a href="https://github.com/Squirrel/Squirrel.Mac#server-support">Server Support</a> 这篇文章来了解。</p>
+<h3>Windows</h3>
+<p>在 Windows 上，你必须使用安装程序将你的应用装到用户的计算机上，所以比较推荐的方法是用 <a href="https://github.com/atom/grunt-electron-installer">grunt-electron-installer</a> 这个模块来自动生成一个 Windows 安装向导。</p>
+<p>Squirrel 自动生成的安装向导会生成一个带 <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd378459(v=vs.85).aspx">Application User Model ID</a> 的快捷方式。
+Application User Model ID 的格式是 <code>com.squirrel.PACKAGE_ID.YOUR_EXE_WITHOUT_DOT_EXE</code>, 比如
+像 <code>com.squirrel.slack.Slack</code> 和 <code>com.squirrel.code.Code</code> 这样的。你应该在自己的应用中使用 <code>app.setAppUserModelId</code> 方法设置相同的 API，不然 Windows 将不能正确地把你的应用固定在任务栏上。</p>
+<p>服务器端的配置和 OS X 也是不一样的，你可以阅读 <a href="https://github.com/Squirrel/Squirrel.Windows">Squirrel.Windows</a> 这个文档来获得详细信息。</p>
+<h3>Linux</h3>
+<p>Linux 下没有任何的自动更新支持，所以我们推荐用各个 Linux 发行版的包管理器来分发你的应用。</p>
+<h2>事件列表</h2>
+<p><code>autoUpdater</code> 对象会触发以下的事件：</p>
+<h3>事件：'error'</h3>
+<p>返回：</p>
+<ul>
+<li><code>error</code> Error</li>
+</ul>
+<p>当更新发生错误的时候触发。</p>
+<h3>事件：'checking-for-update'</h3>
+<p>当开始检查更新的时候触发。</p>
+<h3>事件：'update-available'</h3>
+<p>当发现一个可用更新的时候触发，更新包下载会自动开始。</p>
+<h3>事件：'update-not-available'</h3>
+<p>当没有可用更新的时候触发。</p>
+<h3>事件：'update-downloaded'</h3>
+<p>返回：</p>
+<ul>
+<li><code>event</code> Event</li>
+<li><code>releaseNotes</code> String - 新版本更新公告</li>
+<li><code>releaseName</code> String - 新的版本号</li>
+<li><code>releaseDate</code> Date - 新版本发布的日期</li>
+<li><code>updateURL</code> String - 更新地址</li>
+</ul>
+<p>在更新下载完成的时候触发。</p>
+<p>在 Windows 上只有 <code>releaseName</code> 是有效的。</p>
+<h2>方法列表</h2>
+<p><code>autoUpdater</code> 对象有以下的方法：</p>
+<h3><code>autoUpdater.setFeedURL(url)</code></h3>
+<ul>
+<li><code>url</code> String</li>
+</ul>
+<p>设置检查更新的 <code>url</code>，并且初始化自动更新。这个 <code>url</code> 一旦设置就无法更改。</p>
+<h3><code>autoUpdater.checkForUpdates()</code></h3>
+<p>向服务端查询现在是否有可用的更新。在调用这个方法之前，必须要先调用 <code>setFeedURL</code>。</p>
+<h3><code>autoUpdater.quitAndInstall()</code></h3>
+<p>在下载完成后，重启当前的应用并且安装更新。这个方法应该仅在 <code>update-downloaded</code> 事件触发后被调用。</p>

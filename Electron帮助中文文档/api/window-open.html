@@ -1,0 +1,41 @@
+<h1><code>window.open</code> 函数</h1>
+<p>当在界面中使用 <code>window.open</code> 来创建一个新的窗口时候，将会创建一个 <code>BrowserWindow</code> 的实例，并且将返回一个标识，这个界面通过标识来对这个新的窗口进行有限的控制.</p>
+<p>这个标识对传统的web界面来说，通过它能对子窗口进行有限的功能性兼容控制.
+想要完全的控制这个窗口，可以直接创建一个 <code>BrowserWindow</code> .</p>
+<p>新创建的 <code>BrowserWindow</code> 默认为继承父窗口的属性参数，想重写属性的话可以在 <code>features</code> 中设置他们.</p>
+<h3><code>window.open(url[, frameName][, features])</code></h3>
+<ul>
+<li><code>url</code> String</li>
+<li><code>frameName</code> String (可选)</li>
+<li><code>features</code> String (可选)</li>
+</ul>
+<p>创建一个新的window并且返回一个 <code>BrowserWindowProxy</code> 类的实例.</p>
+<p><code>features</code> 遵循标准浏览器的格式，但是每个feature 应该作为 <code>BrowserWindow</code> 参数的一个字段.</p>
+<h3><code>window.opener.postMessage(message, targetOrigin)</code></h3>
+<ul>
+<li><code>message</code> String</li>
+<li><code>targetOrigin</code> String</li>
+</ul>
+<p>通过指定位置或用 <code>*</code> 来代替没有明确位置来向父窗口发送信息.</p>
+<h2>Class: BrowserWindowProxy</h2>
+<p><code>BrowserWindowProxy</code> 由<code>window.open</code> 创建返回，并且提供了对子窗口的有限功能性控制.</p>
+<h3><code>BrowserWindowProxy.blur()</code></h3>
+<p>子窗口的失去焦点.</p>
+<h3><code>BrowserWindowProxy.close()</code></h3>
+<p>强行关闭子窗口，忽略卸载事件.</p>
+<h3><code>BrowserWindowProxy.closed</code></h3>
+<p>在子窗口关闭之后恢复正常.</p>
+<h3><code>BrowserWindowProxy.eval(code)</code></h3>
+<ul>
+<li><code>code</code> String</li>
+</ul>
+<p>评估子窗口的代码.</p>
+<h3><code>BrowserWindowProxy.focus()</code></h3>
+<p>子窗口获得焦点(让其显示在最前).</p>
+<h3><code>BrowserWindowProxy.postMessage(message, targetOrigin)</code></h3>
+<ul>
+<li><code>message</code> String</li>
+<li><code>targetOrigin</code> String</li>
+</ul>
+<p>通过指定位置或用 <code>*</code> 来代替没有明确位置来向子窗口发送信息.</p>
+<p>除了这些方法，子窗口还可以无特性和使用单一方法来实现  <code>window.opener</code> 对象.</p>

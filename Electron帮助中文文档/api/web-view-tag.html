@@ -1,0 +1,475 @@
+<h1><code>&lt;webview&gt;</code> 标签</h1>
+<p>使用 <code>webview</code> 标签来把 'guest' 内容（例如 web pages ）嵌入到你的 Electron app 中. guest内容包含在 <code>webview</code> 容器中.一个嵌入你应用的page控制着guest内容如何布局摆放和表达含义.</p>
+<p>与 <code>iframe</code> 不同, <code>webview</code> 和你的应用运行的是不同的进程. 它不拥有渲染进程的权限，并且应用和嵌入内容之间的交互全部都是异步的.因为这能保证应用的安全性不受嵌入内容的影响.</p>
+<h2>例子</h2>
+<p>把一个 web page 嵌入到你的app，首先添加 <code>webview</code> 标签到你的app待嵌入page(展示 guest content). 在一个最简单的 <code>webview</code> 中，它包含了  web page 的文件路径和一个控制 <code>webview</code> 容器展示效果的css样式:</p>
+<p><code>html
+&lt;webview id=&quot;foo&quot; src=&quot;https://www.github.com/&quot; style=&quot;display:inline-block; width:640px; height:480px&quot;&gt;&lt;/webview&gt;</code></p>
+<p>如果想随时控制 guest 内容，可以添加 JavaScript 脚本来监听 <code>webview</code> 事件使用  <code>webview</code> 方法来做出响应. 这里是2个事件监听的例子：一个监听 web page 准备加载，另一个监听 web page 停止加载，并且在加载的时候显示一条 &quot;loading...&quot; 信息:</p>
+<p>```html</p>
+<script>
+  onload = function() {
+    var webview = document.getElementById("foo");
+    var indicator = document.querySelector(".indicator");
+
+    var loadstart = function() {
+      indicator.innerText = "loading...";
+    }
+    var loadstop = function() {
+      indicator.innerText = "";
+    }
+    webview.addEventListener("did-start-loading", loadstart);
+    webview.addEventListener("did-stop-loading", loadstop);
+  }
+</script>
+<p>```</p>
+<h2>标签属性</h2>
+<p><code>webview</code> 标签有下面一些属性 :</p>
+<h3><code>src</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot;&gt;&lt;/webview&gt;</code></p>
+<p>将一个可用的url做为这个属性的初始值添加到顶部导航.</p>
+<p>如果把当前页的src添加进去将加载当前page.</p>
+<p><code>src</code>同样可以填 data urls，例如
+<code>data:text/plain,Hello, world!</code>.</p>
+<h3><code>autosize</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot; autosize=&quot;on&quot; minwidth=&quot;576&quot; minheight=&quot;432&quot;&gt;&lt;/webview&gt;</code></p>
+<p>如果这个属性的值为 &quot;on&quot; ， <code>webview</code> 容器将会根据属性<code>minwidth</code>, <code>minheight</code>, <code>maxwidth</code>, 和
+<code>maxheight</code> 的值在它们之间自适应. 只有在 <code>autosize</code> 开启的时候这个约束才会有效. 当 <code>autosize</code> 开启的时候， <code>webview</code> 容器的 size 只能在上面那四个属性值之间.</p>
+<h3><code>nodeintegration</code></h3>
+<p><code>html
+&lt;webview src=&quot;http://www.google.com/&quot; nodeintegration&gt;&lt;/webview&gt;</code></p>
+<p>如果设置了这个属性， <code>webview</code> 中的 guest page 将整合node，并且拥有可以使用系统底层的资源，例如 <code>require</code> 和 <code>process</code> .</p>
+<h3><code>plugins</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot; plugins&gt;&lt;/webview&gt;</code></p>
+<p>如果这个属性的值为 &quot;on&quot; ， <code>webview</code> 中的 guest page 就可以使用浏览器插件。</p>
+<h3><code>preload</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot; preload=&quot;./test.js&quot;&gt;&lt;/webview&gt;</code></p>
+<p>在 guest page 中的其他脚本执行之前预加载一个指定的脚本。规定预加载脚本的url须如 <code>file:</code> 或者 <code>asar:</code>，因为它在是 guest page 中通过通过 <code>require</code> 命令加载的。</p>
+<p>如果  guest page 没有整合 node ，这个脚本将试图使用真个 Node APIs ，但是在这个脚本执行完毕时，之前由node插入的全局对象会被删除。</p>
+<h3><code>httpreferrer</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot; httpreferrer=&quot;http://cheng.guru&quot;&gt;&lt;/webview&gt;</code></p>
+<p>为 guest page 设置 referrer URL。</p>
+<h3><code>useragent</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot; useragent=&quot;Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko&quot;&gt;&lt;/webview&gt;</code></p>
+<p>在 guest page 加载之前为其设置用户代理。如果页面已经加载了，可以使用 <code>setUserAgent</code> 方法来改变用户代理。</p>
+<h3><code>disablewebsecurity</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot; disablewebsecurity&gt;&lt;/webview&gt;</code></p>
+<p>如果这个属性的值为 &quot;on&quot; ， guest page会禁用web安全控制.</p>
+<h3>partition</h3>
+<p><code>html
+&lt;webview src=&quot;https://github.com&quot; partition=&quot;persist:github&quot;&gt;&lt;/webview&gt;
+&lt;webview src=&quot;http://electron.atom.io&quot; partition=&quot;electron&quot;&gt;&lt;/webview&gt;</code></p>
+<p>为page设置session。如果初始值为 <code>partition</code> ,这个 page 将会为app中的所有 page 应用同一个持续有效的 session。如果没有 <code>persist:</code> 前缀, 这个 page 将会使用一个历史 session 。通过分配使用相同的 <code>partition</code>, 所有的page都可以分享相同的session。如果  <code>partition</code> 没有设置，那app将使用默认的session.</p>
+<p>这个值只能在在第一个渲染进程之前设置修改，之后修改的话会无效并且抛出一个DOM异常.</p>
+<h3><code>allowpopups</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot; allowpopups&gt;&lt;/webview&gt;</code></p>
+<p>如果这个属性的值为 &quot;on&quot; ，将允许 guest page 打开一个新窗口。</p>
+<h3><code>blinkfeatures</code></h3>
+<p><code>html
+&lt;webview src=&quot;https://www.github.com/&quot; blinkfeatures=&quot;PreciseMemoryInfo, CSSVariables&quot;&gt;&lt;/webview&gt;</code></p>
+<p>这个属性的值为一个用逗号分隔的列表，它的值指定特性被启用。你可以从<a href="https://code.google.com/p/chromium/codesearch#chromium/src/out/Debug/gen/blink/platform/RuntimeEnabledFeatures.cpp&amp;sq=package:chromium&amp;type=cs&amp;l=527">setFeatureEnabledFromString</a>函数找到完整的支持特性。</p>
+<h2>方法</h2>
+<p><code>webview</code> 的方法集合:</p>
+<p><strong>注意:</strong> webview 元素必须在使用这些方法之前加载完毕。</p>
+<p><strong>例如</strong></p>
+<p><code>javascript
+webview.addEventListener(&quot;dom-ready&quot;, function() {
+  webview.openDevTools();
+});</code></p>
+<h3><code>&lt;webview&gt;.loadURL(url[, options])</code></h3>
+<ul>
+<li><code>url</code> URL</li>
+<li>
+<code>options</code> Object (可选)
+<ul>
+<li><code>httpReferrer</code> String - 一个http类型的url.</li>
+<li><code>userAgent</code> String -用于发起请求的用户代理.</li>
+<li><code>extraHeaders</code> String - 额外的headers,用 &quot;\n&quot;分隔.</li>
+</ul>
+</li>
+</ul>
+<p>加载 webview 中的 <code>url</code>，<code>url</code> 必须包含协议前缀，例如 <code>http://</code> 或 <code>file://</code>.</p>
+<h3><code>&lt;webview&gt;.getURL()</code></h3>
+<p>从 guest page 中返回 url.</p>
+<h3><code>&lt;webview&gt;.getTitle()</code></h3>
+<p>从 guest page 中返回 title.</p>
+<h3><code>&lt;webview&gt;.isLoading()</code></h3>
+<p>返回一个 guest page 是否仍在加载资源的布尔值.</p>
+<h3><code>&lt;webview&gt;.isWaitingForResponse()</code></h3>
+<p>返回一个 guest page 是否正在等待page的主要资源做出回应的布尔值.</p>
+<h3><code>&lt;webview&gt;.stop()</code></h3>
+<p>停止渲染.</p>
+<h3><code>&lt;webview&gt;.reload()</code></h3>
+<p>重新加载 guest page.</p>
+<h3><code>&lt;webview&gt;.reloadIgnoringCache()</code></h3>
+<p>忽视缓存，重新加载 guest page.</p>
+<h3><code>&lt;webview&gt;.canGoBack()</code></h3>
+<p>返回一个 guest page 是否能够回退的布尔值.</p>
+<h3><code>&lt;webview&gt;.canGoForward()</code></h3>
+<p>返回一个 guest page 是否能够前进的布尔值.</p>
+<h3><code>&lt;webview&gt;.canGoToOffset(offset)</code></h3>
+<ul>
+<li><code>offset</code> Integer</li>
+</ul>
+<p>返回一个 guest page 是否能够前进到 <code>offset</code> 的布尔值.</p>
+<h3><code>&lt;webview&gt;.clearHistory()</code></h3>
+<p>清除导航历史.</p>
+<h3><code>&lt;webview&gt;.goBack()</code></h3>
+<p>guest page 回退.</p>
+<h3><code>&lt;webview&gt;.goForward()</code></h3>
+<p>guest page 前进.</p>
+<h3><code>&lt;webview&gt;.goToIndex(index)</code></h3>
+<ul>
+<li><code>index</code> Integer</li>
+</ul>
+<p>guest page 导航到指定的绝对位置.</p>
+<h3><code>&lt;webview&gt;.goToOffset(offset)</code></h3>
+<ul>
+<li><code>offset</code> Integer</li>
+</ul>
+<p>guest page 导航到指定的相对位置.</p>
+<h3><code>&lt;webview&gt;.isCrashed()</code></h3>
+<p>返回一个 渲染进程是否崩溃 的布尔值.</p>
+<h3><code>&lt;webview&gt;.setUserAgent(userAgent)</code></h3>
+<ul>
+<li><code>userAgent</code> String</li>
+</ul>
+<p>重新设置用户代理.</p>
+<h3><code>&lt;webview&gt;.getUserAgent()</code></h3>
+<p>返回用户代理名字，返回类型：<code>String</code>.</p>
+<h3><code>&lt;webview&gt;.insertCSS(css)</code></h3>
+<ul>
+<li><code>css</code> String</li>
+</ul>
+<p>插入css.</p>
+<h3><code>&lt;webview&gt;.executeJavaScript(code, userGesture, callback)</code></h3>
+<ul>
+<li><code>code</code> String</li>
+<li><code>userGesture</code> Boolean - 默认 <code>false</code>.</li>
+<li>
+<code>callback</code> Function (可选) - 回调函数.
+<ul>
+<li><code>result</code></li>
+</ul>
+</li>
+</ul>
+<p>评估  <code>code</code> ，如果 <code>userGesture</code> 值为 true ，它将在这个page里面创建用户手势. HTML APIs ，如 <code>requestFullScreen</code>,它需要用户响应，那么将自动通过这个参数优化.</p>
+<h3><code>&lt;webview&gt;.openDevTools()</code></h3>
+<p>为 guest page 打开开发工具调试窗口.</p>
+<h3><code>&lt;webview&gt;.closeDevTools()</code></h3>
+<p>为 guest page 关闭开发工具调试窗口.</p>
+<h3><code>&lt;webview&gt;.isDevToolsOpened()</code></h3>
+<p>返回一个 guest page 是否打开了开发工具调试窗口的布尔值.</p>
+<h3><code>&lt;webview&gt;.isDevToolsFocused()</code></h3>
+<p>返回一个 guest page 是否聚焦了开发工具调试窗口的布尔值.</p>
+<h3><code>&lt;webview&gt;.inspectElement(x, y)</code></h3>
+<ul>
+<li><code>x</code> Integer</li>
+<li><code>y</code> Integer</li>
+</ul>
+<p>开始检查 guest page 在 (<code>x</code>, <code>y</code>) 位置的元素.</p>
+<h3><code>&lt;webview&gt;.inspectServiceWorker()</code></h3>
+<p>在 guest page 中为服务人员打开开发工具.</p>
+<h3><code>&lt;webview&gt;.setAudioMuted(muted)</code></h3>
+<ul>
+<li><code>muted</code> Boolean
+设置 guest page 流畅(muted).</li>
+</ul>
+<h3><code>&lt;webview&gt;.isAudioMuted()</code></h3>
+<p>返回一个 guest page 是否流畅的布尔值.</p>
+<h3><code>&lt;webview&gt;.undo()</code></h3>
+<p>在page中编辑执行 <code>undo</code> 命令.</p>
+<h3><code>&lt;webview&gt;.redo()</code></h3>
+<p>在page中编辑执行 <code>redo</code> 命令.</p>
+<h3><code>&lt;webview&gt;.cut()</code></h3>
+<p>在page中编辑执行 <code>cut</code> 命令.</p>
+<h3><code>&lt;webview&gt;.copy()</code></h3>
+<p>在page中编辑执行 <code>copy</code> 命令.</p>
+<h3><code>&lt;webview&gt;.paste()</code></h3>
+<p>在page中编辑执行 <code>paste</code> 命令.</p>
+<h3><code>&lt;webview&gt;.pasteAndMatchStyle()</code></h3>
+<p>在page中编辑执行 <code>pasteAndMatchStyle</code> 命令.</p>
+<h3><code>&lt;webview&gt;.delete()</code></h3>
+<p>在page中编辑执行 <code>delete</code> 命令.</p>
+<h3><code>&lt;webview&gt;.selectAll()</code></h3>
+<p>在page中编辑执行 <code>selectAll</code> 命令.</p>
+<h3><code>&lt;webview&gt;.unselect()</code></h3>
+<p>在page中编辑执行 <code>unselect</code> 命令.</p>
+<h3><code>&lt;webview&gt;.replace(text)</code></h3>
+<ul>
+<li><code>text</code> String</li>
+</ul>
+<p>在page中编辑执行 <code>replace</code> 命令.</p>
+<h3><code>&lt;webview&gt;.replaceMisspelling(text)</code></h3>
+<ul>
+<li><code>text</code> String</li>
+</ul>
+<p>在page中编辑执行 <code>replaceMisspelling</code> 命令.</p>
+<h3><code>&lt;webview&gt;.insertText(text)</code></h3>
+<ul>
+<li><code>text</code> String</li>
+</ul>
+<p>插入文本.</p>
+<h3><code>&lt;webview&gt;.findInPage(text[, options])</code></h3>
+<ul>
+<li><code>text</code> String - 搜索内容,不能为空.</li>
+<li>
+<code>options</code> Object (可选)
+<ul>
+<li><code>forward</code> Boolean - 向前或向后, 默认为 <code>true</code>.</li>
+<li><code>findNext</code> Boolean - 是否查找的第一个结果,
+默认为 <code>false</code>.</li>
+<li><code>matchCase</code> Boolean - 是否区分大小写,
+默认为 <code>false</code>.</li>
+<li><code>wordStart</code> Boolean - 是否只查找首字母.
+默认为 <code>false</code>.</li>
+<li><code>medialCapitalAsWordStart</code> Boolean - 当配合 <code>wordStart</code>的时候,接受一个文字中的匹配项，要求匹配项是以大写字母开头后面跟小写字母或者没有字母。可以接受一些其他单词内部匹配, 默认为 <code>false</code>.</li>
+</ul>
+</li>
+</ul>
+<p>发起一个请求来寻找页面中的所有匹配 <code>text</code> 的地方并且返回一个 <code>Integer</code>来表示这个请求用的请求Id. 这个请求结果可以通过订阅<a href="web-view-tag.md#event-found-in-page"><code>found-in-page</code></a> 事件来取得.</p>
+<h3><code>&lt;webview&gt;.stopFindInPage(action)</code></h3>
+<ul>
+<li>
+<code>action</code> String - 指定一个行为来接替停止
+  <a href="web-view-tag.md#webviewtagfindinpage"><code>&lt;webview&gt;.findInPage</code></a> 请求.
+<ul>
+<li><code>clearSelection</code> - 转变为一个普通的 selection.</li>
+<li><code>keepSelection</code> - 清除 selection.</li>
+<li><code>activateSelection</code> - 聚焦并点击 selection node.</li>
+</ul>
+</li>
+</ul>
+<p>使用 <code>action</code> 停止 <code>findInPage</code> 请求.</p>
+<h3><code>&lt;webview&gt;.print([options])</code></h3>
+<p>打印输出 <code>webview</code> 的 web page. 类似 <code>webContents.print([options])</code>.</p>
+<h3><code>&lt;webview&gt;.printToPDF(options, callback)</code></h3>
+<p>以pdf格式打印输出 <code>webview</code> 的 web page. 类似 <code>webContents.printToPDF(options, callback)</code>.</p>
+<h3><code>&lt;webview&gt;.send(channel[, arg1][, arg2][, ...])</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>arg</code> (可选)</li>
+</ul>
+<p>通过 <code>channel</code> 向渲染进程发出异步消息，你也可以发送任意的参数。
+渲染进程通过<code>ipcRenderer</code> 模块监听 <code>channel</code> 事件来控制消息.</p>
+<p>例子
+<a href="web-contents.md#webcontentssendchannel-args">webContents.send</a>.</p>
+<h3><code>&lt;webview&gt;.sendInputEvent(event)</code></h3>
+<ul>
+<li><code>event</code> Object</li>
+</ul>
+<p>向 page 发送输入事件.</p>
+<p>查看 <a href="web-contents.md##webcontentssendinputeventevent">webContents.sendInputEvent</a>
+关于 <code>event</code> 对象的相信介绍.</p>
+<h3><code>&lt;webview&gt;.getWebContents()</code></h3>
+<p>返回和这个 <code>webview</code> 相关的 <a href="web-contents.html">WebContents</a>.</p>
+<h2>DOM 事件</h2>
+<p><code>webview</code> 可用下面的 DOM 事件:</p>
+<h3>Event: 'load-commit'</h3>
+<p>返回:</p>
+<ul>
+<li><code>url</code> String</li>
+<li><code>isMainFrame</code> Boolean</li>
+</ul>
+<p>加载完成触发. 这个包含当前文档的导航和副框架的文档加载，但是不包含异步资源加载.</p>
+<h3>Event: 'did-finish-load'</h3>
+<p>在导航加载完成时触发，也就是tab 的 spinner停止spinning，并且加载事件处理.</p>
+<h3>Event: 'did-fail-load'</h3>
+<p>Returns:</p>
+<ul>
+<li><code>errorCode</code> Integer</li>
+<li><code>errorDescription</code> String</li>
+<li><code>validatedURL</code> String</li>
+</ul>
+<p>类似 <code>did-finish-load</code> ，在加载失败或取消是触发，例如提出    <code>window.stop()</code>.</p>
+<h3>Event: 'did-frame-finish-load'</h3>
+<p>返回:</p>
+<ul>
+<li><code>isMainFrame</code> Boolean</li>
+</ul>
+<p>当一个 frame 完成 加载时触发.</p>
+<h3>Event: 'did-start-loading'</h3>
+<p>开始加载时触发.</p>
+<h3>Event: 'did-stop-loading'</h3>
+<p>停止家在时触发.</p>
+<h3>Event: 'did-get-response-details'</h3>
+<p>返回:</p>
+<ul>
+<li><code>status</code> Boolean</li>
+<li><code>newURL</code> String</li>
+<li><code>originalURL</code> String</li>
+<li><code>httpResponseCode</code> Integer</li>
+<li><code>requestMethod</code> String</li>
+<li><code>referrer</code> String</li>
+<li><code>headers</code> Object</li>
+</ul>
+<p>当获得返回详情的时候触发.</p>
+<p><code>status</code> 指示 socket 连接来下载资源.</p>
+<h3>Event: 'did-get-redirect-request'</h3>
+<p>返回:</p>
+<ul>
+<li><code>oldURL</code> String</li>
+<li><code>newURL</code> String</li>
+<li><code>isMainFrame</code> Boolean</li>
+</ul>
+<p>当重定向请求资源被接收的时候触发.</p>
+<h3>Event: 'dom-ready'</h3>
+<p>当指定的frame文档加载完毕时触发.</p>
+<h3>Event: 'page-title-updated'</h3>
+<p>返回:</p>
+<ul>
+<li><code>title</code> String</li>
+<li><code>explicitSet</code> Boolean</li>
+</ul>
+<p>当导航中的页面title被设置时触发.
+在title通过文档路径异步加载时<code>explicitSet</code>为false.</p>
+<h3>Event: 'page-favicon-updated'</h3>
+<p>返回:</p>
+<ul>
+<li><code>favicons</code> Array - Array of URLs.</li>
+</ul>
+<p>当page收到了图标url时触发.</p>
+<h3>Event: 'enter-html-full-screen'</h3>
+<p>当通过HTML API使界面进入全屏时触发.</p>
+<h3>Event: 'leave-html-full-screen'</h3>
+<p>当通过HTML API使界面退出全屏时触发.</p>
+<h3>Event: 'console-message'</h3>
+<p>返回:</p>
+<ul>
+<li><code>level</code> Integer</li>
+<li><code>message</code> String</li>
+<li><code>line</code> Integer</li>
+<li><code>sourceId</code> String</li>
+</ul>
+<p>当客户端输出控制台信息的时候触发.</p>
+<p>下面示例代码将所有信息输出到内置控制台，没有考虑到输出等级和其他属性。</p>
+<p><code>javascript
+webview.addEventListener('console-message', function(e) {
+  console.log('Guest page logged a message:', e.message);
+});</code></p>
+<h3>Event: 'found-in-page'</h3>
+<p>返回:</p>
+<ul>
+<li>
+<code>result</code> Object
+<ul>
+<li><code>requestId</code> Integer</li>
+<li><code>finalUpdate</code> Boolean - 指明下面是否还有更多的回应.</li>
+<li><code>activeMatchOrdinal</code> Integer (可选) - 活动匹配位置</li>
+<li><code>matches</code> Integer (optional) - 匹配数量.</li>
+<li><code>selectionArea</code> Object (optional) - 整合第一个匹配域.</li>
+</ul>
+</li>
+</ul>
+<p>在请求<a href="web-view-tag.md#webviewtagfindinpage"><code>webview.findInPage</code></a>结果有效时触发.</p>
+<p>```javascript
+webview.addEventListener('found-in-page', function(e) {
+  if (e.result.finalUpdate)
+    webview.stopFindInPage(&quot;keepSelection&quot;);
+});</p>
+<p>const rquestId = webview.findInPage(&quot;test&quot;);
+```</p>
+<h3>Event: 'new-window'</h3>
+<p>返回:</p>
+<ul>
+<li><code>url</code> String</li>
+<li><code>frameName</code> String</li>
+<li><code>disposition</code> String - 可以为 <code>default</code>, <code>foreground-tab</code>, <code>background-tab</code>,
+  <code>new-window</code> 和 <code>other</code>.</li>
+<li><code>options</code> Object - 参数应该被用作创建新的
+  <code>BrowserWindow</code>.</li>
+</ul>
+<p>在 guest page 试图打开一个新的浏览器窗口时触发.</p>
+<p>下面示例代码在系统默认浏览器中打开了一个新的url.</p>
+<p><code>javascript
+webview.addEventListener('new-window', function(e) {
+  require('electron').shell.openExternal(e.url);
+});</code></p>
+<h3>Event: 'will-navigate'</h3>
+<p>返回:</p>
+<ul>
+<li><code>url</code> String</li>
+</ul>
+<p>当用户或page尝试开始导航时触发.
+它能在 <code>window.location</code> 变化或者用户点击连接的时候触发.</p>
+<p>这个事件在以 APIS 编程方式开始导航时不会触发，例如 <code>&lt;webview&gt;.loadURL</code> 和 <code>&lt;webview&gt;.back</code>.</p>
+<p>在页面内部导航跳转也将不回触发这个事件，例如点击锚链接或更新 <code>window.location.hash</code>.使用 <code>did-navigate-in-page</code> 来实现页内跳转事件.</p>
+<p>使用 <code>event.preventDefault()</code> 并不会起什么用.</p>
+<h3>Event: 'did-navigate'</h3>
+<p>返回:</p>
+<ul>
+<li><code>url</code> String</li>
+</ul>
+<p>当导航结束时触发.</p>
+<p>在页面内部导航跳转也将不回触发这个事件，例如点击锚链接或更新 <code>window.location.hash</code>.使用 <code>did-navigate-in-page</code> 来实现页内跳转事件.</p>
+<h3>Event: 'did-navigate-in-page'</h3>
+<p>返回:</p>
+<ul>
+<li><code>url</code> String</li>
+</ul>
+<p>当页内导航发生时触发.
+当业内导航发生时，page url改变了，但是不会跳出 page . 例如在锚链接被电击或DOM <code>hashchange</code> 事件发生时触发.</p>
+<h3>Event: 'close'</h3>
+<p>在 guest page试图关闭自己的时候触发.</p>
+<p>下面的示例代码指示了在客户端试图关闭自己的时候将改变导航连接为<code>about:blank</code>.</p>
+<p><code>javascript
+webview.addEventListener('close', function() {
+  webview.src = 'about:blank';
+});</code></p>
+<h3>Event: 'ipc-message'</h3>
+<p>返回:</p>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>args</code> Array</li>
+</ul>
+<p>在 guest page 向嵌入页发送一个异步消息的时候触发.</p>
+<p>你可以很简单的使用 <code>sendToHost</code> 方法和 <code>ipc-message</code> 事件在 guest page 和 嵌入页(embedder page)之间通信:</p>
+<p><code>javascript
+// In embedder page.
+webview.addEventListener('ipc-message', function(event) {
+  console.log(event.channel);
+  // Prints &quot;pong&quot;
+});
+webview.send('ping');</code></p>
+<p><code>javascript
+// In guest page.
+var ipcRenderer = require('electron').ipcRenderer;
+ipcRenderer.on('ping', function() {
+  ipcRenderer.sendToHost('pong');
+});</code></p>
+<h3>Event: 'crashed'</h3>
+<p>在渲染进程崩溃的时候触发.</p>
+<h3>Event: 'gpu-crashed'</h3>
+<p>在GPU进程崩溃的时候触发.</p>
+<h3>Event: 'plugin-crashed'</h3>
+<p>返回:</p>
+<ul>
+<li><code>name</code> String</li>
+<li><code>version</code> String</li>
+</ul>
+<p>在插件进程崩溃的时候触发.</p>
+<h3>Event: 'destroyed'</h3>
+<p>在界面内容销毁的时候触发.</p>
+<h3>Event: 'media-started-playing'</h3>
+<p>在媒体准备播放的时候触发.</p>
+<h3>Event: 'media-paused'</h3>
+<p>在媒体暂停播放或播放放毕的时候触发.</p>
+<h3>Event: 'did-change-theme-color'</h3>
+<p>在页面的主体色改变的时候触发. 
+在使用 meta 标签的时候这就很常见了:</p>
+<p><code>html
+&lt;meta name='theme-color' content='#ff0000'&gt;</code></p>
+<h3>Event: 'devtools-opened'</h3>
+<p>在开发者工具打开的时候触发.</p>
+<h3>Event: 'devtools-closed'</h3>
+<p>在开发者工具关闭的时候触发.</p>
+<h3>Event: 'devtools-focused'</h3>
+<p>在开发者工具获取焦点的时候触发.</p>

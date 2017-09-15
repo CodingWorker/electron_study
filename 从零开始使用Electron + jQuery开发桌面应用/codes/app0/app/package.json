@@ -1,0 +1,19 @@
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "my-study-simple-proj",
+  "main": "app/main.js",
+  "dependencies": {
+    "electron-prebuilt": "^0.37.3"
+  },
+  "devDependencies": {
+    "electron": "^1.7.6",
+    "electron-prebuilt": "^0.37.3"
+  },
+  "scripts": {
+    "test": "hello",
+    "start": "electron ."
+  },
+  "author": "CodingWorker",
+  "license": "MIT"
+}

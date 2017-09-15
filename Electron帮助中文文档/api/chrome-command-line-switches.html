@@ -1,0 +1,76 @@
+<h1>支持的 Chrome 命令行开关</h1>
+<p>这页列出了Chrome浏览器和Electron支持的命令行开关. 你也可以在<a href="app.md">app</a>模块的<a href="app.md#event-ready">ready</a>事件发出之前使用<a href="app.md#appcommandlineappendswitchswitch-value">app.commandLine.appendSwitch</a> 来添加它们到你应用的main脚本里面:</p>
+<p>```javascript
+const app = require('electron').app;
+app.commandLine.appendSwitch('remote-debugging-port', '8315');
+app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');</p>
+<p>app.on('ready', function() {
+  // Your code here
+});
+```</p>
+<h2>--client-certificate=<code>path</code></h2>
+<p>设置客户端的证书文件 <code>path</code> .</p>
+<h2>--ignore-connections-limit=<code>domains</code></h2>
+<p>忽略用 <code>,</code> 分隔的 <code>domains</code> 列表的连接限制.</p>
+<h2>--disable-http-cache</h2>
+<p>禁用 HTTP 请求.</p>
+<h2>--remote-debugging-port=<code>port</code></h2>
+<p>在指定的 <code>端口</code> 通过 HTTP 开启远程调试.</p>
+<h2>--js-flags=<code>flags</code></h2>
+<p>指定引擎过渡到 JS 引擎. </p>
+<p>在启动Electron时，如果你想在主进程中激活 <code>flags</code> ，它将被转换.</p>
+<p><code>bash
+$ electron --js-flags=&quot;--harmony_proxies --harmony_collections&quot; your-app</code></p>
+<h2>--proxy-server=<code>address:port</code></h2>
+<p>使用一个特定的代理服务器，它将比系统设置的优先级更高.这个开关只有在使用 HTTP 协议时有效，它包含 HTTPS 和 WebSocket 请求. 值得注意的是，不是所有的代理服务器都支持 HTTPS 和 WebSocket 请求.</p>
+<h2>--proxy-bypass-list=<code>hosts</code></h2>
+<p>让 Electron 使用(原文:bypass) 提供的以 semi-colon 分隔的hosts列表的代理服务器.这个开关只有在使用 <code>--proxy-server</code> 时有效.</p>
+<p>例如:</p>
+<p><code>javascript
+app.commandLine.appendSwitch('proxy-bypass-list', '&lt;local&gt;;*.google.com;*foo.com;1.2.3.4:5678')</code></p>
+<p>将会为所有的hosts使用代理服务器，除了本地地址 (<code>localhost</code>,
+<code>127.0.0.1</code> etc.), <code>google.com</code> 子域, 以 <code>foo.com</code> 结尾的hosts，和所有类似 <code>1.2.3.4:5678</code>的.</p>
+<h2>--proxy-pac-url=<code>url</code></h2>
+<p>在指定的 <code>url</code> 上使用 PAC 脚本.</p>
+<h2>--no-proxy-server</h2>
+<p>不使用代理服务并且总是使用直接连接.忽略所有的合理代理标志.</p>
+<h2>--host-rules=<code>rules</code></h2>
+<p>一个逗号分隔的 <code>rule</code> 列表来控制主机名如何映射.</p>
+<p>例如:</p>
+<ul>
+<li><code>MAP * 127.0.0.1</code> 强制所有主机名映射到 127.0.0.1</li>
+<li><code>MAP *.google.com proxy</code> 强制所有 google.com 子域 使用 &quot;proxy&quot;.</li>
+<li><code>MAP test.com [::1]:77</code> 强制 &quot;test.com&quot; 使用 IPv6 回环地址. 也强制使用端口 77.</li>
+<li><code>MAP * baz, EXCLUDE www.google.com</code> 重新全部映射到 &quot;baz&quot;, 除了
+  &quot;www.google.com&quot;.</li>
+</ul>
+<p>这些映射适用于终端网络请求
+(TCP 连接
+和 主机解析 以直接连接的方式, 和 <code>CONNECT</code> 以代理连接, 还有 终端 host 使用 <code>SOCKS</code> 代理连接).</p>
+<h2>--host-resolver-rules=<code>rules</code></h2>
+<p>类似 <code>--host-rules</code> ，但是 <code>rules</code> 只适合主机解析.</p>
+<h2>--ignore-certificate-errors</h2>
+<p>忽略与证书相关的错误.</p>
+<h2>--ppapi-flash-path=<code>path</code></h2>
+<p>设置Pepper Flash插件的路径 <code>path</code> .</p>
+<h2>--ppapi-flash-version=<code>version</code></h2>
+<p>设置Pepper Flash插件版本号.</p>
+<h2>--log-net-log=<code>path</code></h2>
+<p>使网络日志事件能够被读写到 <code>path</code>.</p>
+<h2>--ssl-version-fallback-min=<code>version</code></h2>
+<p>设置最简化的 SSL/TLS 版本号 (&quot;tls1&quot;, &quot;tls1.1&quot; or &quot;tls1.2&quot;)，TLS 可接受回退.</p>
+<h2>--cipher-suite-blacklist=<code>cipher_suites</code></h2>
+<p>指定逗号分隔的 SSL 密码套件 列表实效.</p>
+<h2>--disable-renderer-backgrounding</h2>
+<p>防止 Chromium 降低隐藏的渲染进程优先级.</p>
+<p>这个标志对所有渲染进程全局有效，如果你只想在一个窗口中禁止使用，你可以采用 hack 方法<a href="https://github.com/atom/atom/pull/9485/files">playing silent audio</a>.</p>
+<h2>--enable-logging</h2>
+<p>打印 Chromium 信息输出到控制台.</p>
+<p>如果在用户应用加载完成之前解析<code>app.commandLine.appendSwitch</code> ，这个开关将实效，但是你可以设置 <code>ELECTRON_ENABLE_LOGGING</code> 环境变量来达到相同的效果.</p>
+<h2>--v=<code>log_level</code></h2>
+<p>设置默认最大活跃 V-logging 标准; 默认为 0.通常 V-logging 标准值为肯定值.</p>
+<p>这个开关只有在 <code>--enable-logging</code> 开启时有效.</p>
+<h2>--vmodule=<code>pattern</code></h2>
+<p>赋予每个模块最大的 V-logging levels 来覆盖 <code>--v</code> 给的值.E.g. <code>my_module=2,foo*=3</code> 会改变所有源文件 <code>my_module.*</code> and <code>foo*.*</code> 的代码中的 logging level .</p>
+<p>任何包含向前的(forward slash)或者向后的(backward slash)模式将被测试用于阻止整个路径名，并且不仅是E.g模块.<code>*/foo/bar/*=2</code> 将会改变所有在 <code>foo/bar</code> 下的源文件代码中的 logging level .</p>
+<p>这个开关只有在 <code>--enable-logging</code> 开启时有效.</p>

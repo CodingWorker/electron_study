@@ -1,0 +1,33 @@
+<h1>使用原生模块</h1>
+<p>Electron 同样也支持原生模块，但由于和官方的 Node 相比使用了不同的 V8 引擎，如果你想编译原生模块，则需要手动设置 Electron 的 headers 的位置。</p>
+<h2>原生Node模块的兼容性</h2>
+<p>当 Node 开始换新的V8引擎版本时，原生模块可能“坏”掉。为确保一切工作正常，你需要检查你想要使用的原生模块是否被 Electron 内置的 Node 支持。你可以在<a href="https://github.com/atom/electron/releases">这里</a>查看 Electron 内置的 Node 版本，或者使用 <code>process.version</code> (参考：<a href="https://github.com/atom/electron/blob/master/docs/tutorial/quick-start.md">快速入门</a>)查看。</p>
+<p>考虑到 <a href="https://github.com/nodejs/nan/">NAN</a> 可以使你的开发更容易对多版本 Node 的支持，建议使用它来开发你自己的模块。你也可以使用 <a href="https://github.com/nodejs/nan/">NAN</a> 来移植旧的模块到新的 Nod e版本，以使它们可以在新的 Electron 下良好工作。</p>
+<h2>如何安装原生模块</h2>
+<p>如下三种方法教你安装原生模块：</p>
+<h3>最简单方式</h3>
+<p>最简单的方式就是通过 <a href="https://github.com/paulcbetts/electron-rebuild"><code>electron-rebuild</code></a> 包重新编译原生模块，它帮你自动完成了下载 headers、编译原生模块等步骤：</p>
+<p>```sh
+npm install --save-dev electron-rebuild</p>
+<h1>每次运行&quot;npm install&quot;时，也运行这条命令</h1>
+<p>./node_modules/.bin/electron-rebuild</p>
+<h1>在windows下如果上述命令遇到了问题，尝试这个：</h1>
+<p>.\node_modules.bin\electron-rebuild.cmd
+```</p>
+<h3>通过 npm 安装</h3>
+<p>你当然也可以通过 <code>npm</code> 安装原生模块。大部分步骤和安装普通模块时一样，除了以下一些系统环境变量你需要自己操作：</p>
+<p><code>bash
+export npm_config_disturl=https://atom.io/download/atom-shell
+export npm_config_target=0.33.1
+export npm_config_arch=x64
+export npm_config_runtime=electron
+HOME=~/.electron-gyp npm install module-name</code></p>
+<h3>通过 node-gyp 安装</h3>
+<p>你需要告诉 <code>node-gyp</code> 去哪下载 Electron 的 headers，以及下载什么版本：</p>
+<p><code>bash
+$ cd /path-to-module/
+$ HOME=~/.electron-gyp node-gyp rebuild --target=0.29.1 --arch=x64 --dist-url=https://atom.io/download/atom-shell</code></p>
+<p><code>HOME=~/.electron-gyp</code> 设置去哪找开发时的 headers。</p>
+<p><code>--target=0.29.1</code> 设置了 Electron 的版本</p>
+<p><code>--dist-url=...</code> 设置了 Electron 的 headers 的下载地址</p>
+<p><code>--arch=x64</code> 设置了该模块为适配64位操作系统而编译</p>

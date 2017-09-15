@@ -1,0 +1,45 @@
+<h1>global-shortcut</h1>
+<p><code>global-shortcut</code> 模块可以便捷的为您设置(注册/注销)各种自定义操作的快捷键.</p>
+<p><strong>Note</strong>: 使用此模块注册的快捷键是系统全局的(QQ截图那种), 不要在应用模块(app module)响应 <code>ready</code>
+消息前使用此模块(注册快捷键).</p>
+<p>```javascript
+var app = require('app');
+var globalShortcut = require('global-shortcut');</p>
+<p>app.on('ready', function() {
+  // Register a 'ctrl+x' shortcut listener.
+  var ret = globalShortcut.register('ctrl+x', function() {
+    console.log('ctrl+x is pressed');
+  })</p>
+<p>if (!ret) {
+    console.log('registration failed');
+  }</p>
+<p>// Check whether a shortcut is registered.
+  console.log(globalShortcut.isRegistered('ctrl+x'));
+});</p>
+<p>app.on('will-quit', function() {
+  // Unregister a shortcut.
+  globalShortcut.unregister('ctrl+x');</p>
+<p>// Unregister all shortcuts.
+  globalShortcut.unregisterAll();
+});
+```</p>
+<h2>Methods</h2>
+<p><code>global-shortcut</code> 模块包含以下函数:</p>
+<h3><code>globalShortcut.register(accelerator, callback)</code></h3>
+<ul>
+<li><code>accelerator</code> <a href="accelerator.html">Accelerator</a></li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>注册 <code>accelerator</code> 快捷键. 当用户按下注册的快捷键时将会调用 <code>callback</code> 函数.</p>
+<h3><code>globalShortcut.isRegistered(accelerator)</code></h3>
+<ul>
+<li><code>accelerator</code> <a href="accelerator.html">Accelerator</a></li>
+</ul>
+<p>查询 <code>accelerator</code> 快捷键是否已经被注册过了,将会返回 <code>true</code>(已被注册) 或 <code>false</code>(未注册).</p>
+<h3><code>globalShortcut.unregister(accelerator)</code></h3>
+<ul>
+<li><code>accelerator</code> <a href="accelerator.html">Accelerator</a></li>
+</ul>
+<p>注销全局快捷键 <code>accelerator</code>.</p>
+<h3><code>globalShortcut.unregisterAll()</code></h3>
+<p>注销本应用注册的所有全局快捷键.</p>

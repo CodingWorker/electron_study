@@ -1,0 +1,498 @@
+
+<h1>session</h1>
+<p><code>session</code> 模块可以用来创建一个新的 <code>Session</code> 对象.</p>
+<p>你也可以通过使用 <a href="web-contents.html"><code>webContents</code></a> 的属性 <code>session</code> 来使用一个已有页面的 <code>session</code> ，<code>webContents</code> 是<a href="browser-window.html"><code>BrowserWindow</code></a> 的属性.</p>
+<p>```javascript
+const BrowserWindow = require('electron').BrowserWindow;</p>
+<p>var win = new BrowserWindow({ width: 800, height: 600 });
+win.loadURL(&quot;http://github.com&quot;);</p>
+<p>var ses = win.webContents.session;
+```</p>
+<h2>方法</h2>
+<p><code>session</code> 模块有如下方法:</p>
+<h3>session.fromPartition(partition)</h3>
+<ul>
+<li><code>partition</code> String</li>
+</ul>
+<p>从字符串 <code>partition</code> 返回一个新的 <code>Session</code> 实例.</p>
+<p>如果 <code>partition</code> 以 <code>persist:</code> 开头，那么这个page将使用一个持久的 session，这个 session 将对应用的所有 page 可用.如果没前缀，这个 page 将使用一个历史 session.如果 <code>partition</code> 为空，那么将返回应用的默认 session .</p>
+<h2>属性</h2>
+<p><code>session</code> 模块有如下属性:</p>
+<h3>session.defaultSession</h3>
+<p>返回应用的默认 session 对象.</p>
+<h2>Class: Session</h2>
+<p>可以在 <code>session</code> 模块中创建一个 <code>Session</code> 对象 :</p>
+<p>```javascript
+const session = require('electron').session;</p>
+<p>var ses = session.fromPartition('persist:name');
+```</p>
+<h3>实例事件</h3>
+<p>实例 <code>Session</code> 有以下事件:</p>
+<h4>Event: 'will-download'</h4>
+<ul>
+<li><code>event</code> Event</li>
+<li><code>item</code> <a href="download-item.html">DownloadItem</a></li>
+<li><code>webContents</code> <a href="web-contents.html">WebContents</a></li>
+</ul>
+<p>当 Electron 将要从 <code>webContents</code> 下载 <code>item</code> 时触发.</p>
+<p>调用 <code>event.preventDefault()</code> 可以取消下载，并且在进程的下个 tick中，这个 <code>item</code> 也不可用.</p>
+<p><code>javascript
+session.defaultSession.on('will-download', function(event, item, webContents) {
+  event.preventDefault();
+  require('request')(item.getURL(), function(data) {
+    require('fs').writeFileSync('/somewhere', data);
+  });
+});</code></p>
+<h3>实例方法</h3>
+<p>实例 <code>Session</code> 有以下方法:</p>
+<h4><code>ses.cookies</code></h4>
+<p><code>cookies</code> 赋予你全力来查询和修改 cookies. 例如:</p>
+<p>```javascript
+// 查询所有 cookies.
+session.defaultSession.cookies.get({}, function(error, cookies) {
+  console.log(cookies);
+});</p>
+<p>// 查询与指定 url 相关的所有 cookies.
+session.defaultSession.cookies.get({ url : &quot;http://www.github.com&quot; }, function(error, cookies) {
+  console.log(cookies);
+});</p>
+<p>// 设置 cookie;
+// may overwrite equivalent cookies if they exist.
+var cookie = { url : &quot;http://www.github.com&quot;, name : &quot;dummy_name&quot;, value : &quot;dummy&quot; };
+session.defaultSession.cookies.set(cookie, function(error) {
+  if (error)
+    console.error(error);
+});
+```</p>
+<h4><code>ses.cookies.get(filter, callback)</code></h4>
+<ul>
+<li>
+<code>filter</code> Object
+<ul>
+<li><code>url</code> String (可选) - 与获取 cookies 相关的 
+<code>url</code>.不设置的话就是从所有 url 获取 cookies .</li>
+<li><code>name</code> String (可选) - 通过 name 过滤 cookies.</li>
+<li><code>domain</code> String (可选) - 获取对应域名或子域名的 cookies .</li>
+<li><code>path</code> String (可选) - 获取对应路径的 cookies .</li>
+<li><code>secure</code> Boolean (可选) - 通过安全性过滤 cookies.</li>
+<li><code>session</code> Boolean (可选) - 过滤掉 session 或 持久的 cookies.</li>
+</ul>
+</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>发送一个请求，希望获得所有匹配 <code>details</code> 的 cookies, 
+在完成的时候，将通过 <code>callback(error, cookies)</code> 调用 <code>callback</code>.</p>
+<p><code>cookies</code>是一个 <code>cookie</code> 对象.</p>
+<ul>
+<li>
+<code>cookie</code> Object
+<ul>
+<li><code>name</code> String - cookie 名.</li>
+<li><code>value</code> String - cookie值.</li>
+<li><code>domain</code> String - cookie域名.</li>
+<li><code>hostOnly</code> String - 是否 cookie 是一个 host-only cookie.</li>
+<li><code>path</code> String - cookie路径.</li>
+<li><code>secure</code> Boolean - 是否是安全 cookie.</li>
+<li><code>httpOnly</code> Boolean - 是否只是 HTTP cookie.</li>
+<li><code>session</code> Boolean - cookie 是否是一个 session cookie 或一个带截至日期的持久
+ cookie .</li>
+<li><code>expirationDate</code> Double (可选) - cookie的截至日期，数值为UNIX纪元以来的秒数. 对session cookies 不提供.</li>
+</ul>
+</li>
+</ul>
+<h4><code>ses.cookies.set(details, callback)</code></h4>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>url</code> String - 与获取 cookies 相关的 
+<code>url</code>.</li>
+<li><code>name</code> String - cookie 名. 忽略默认为空.</li>
+<li><code>value</code> String - cookie 值. 忽略默认为空.</li>
+<li><code>domain</code> String - cookie的域名. 忽略默认为空.</li>
+<li><code>path</code> String - cookie 的路径. 忽略默认为空.</li>
+<li><code>secure</code> Boolean - 是否已经进行了安全性标识. 默认为
+false.</li>
+<li><code>session</code> Boolean - 是否已经 HttpOnly 标识. 默认为 false.</li>
+<li><code>expirationDate</code> Double -	cookie的截至日期，数值为UNIX纪元以来的秒数. 如果忽略, cookie 变为 session cookie.</li>
+</ul>
+</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>使用 <code>details</code> 设置 cookie, 完成时使用 <code>callback(error)</code> 掉哟个 <code>callback</code> .</p>
+<h4><code>ses.cookies.remove(url, name, callback)</code></h4>
+<ul>
+<li>
+<code>url</code> String - 与 cookies 相关的 
+<code>url</code>.
+</li>
+<li><code>name</code> String - 需要删除的 cookie 名.</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>删除匹配 <code>url</code> 和 <code>name</code> 的 cookie, 完成时使用 <code>callback()</code>调用<code>callback</code>.</p>
+<h4><code>ses.getCacheSize(callback)</code></h4>
+<ul>
+<li>
+<code>callback</code> Function
+<ul>
+<li><code>size</code> Integer - 单位 bytes 的缓存 size.</li>
+</ul>
+</li>
+</ul>
+<p>返回 session 的当前缓存 size .</p>
+<h4><code>ses.clearCache(callback)</code></h4>
+<ul>
+<li><code>callback</code> Function - 操作完成时调用</li>
+</ul>
+<p>清空 session 的 HTTP 缓存.</p>
+<h4><code>ses.clearStorageData([options, ]callback)</code></h4>
+<ul>
+<li>
+<code>options</code> Object (可选)
+<ul>
+<li><code>origin</code> String - 应当遵循 <code>window.location.origin</code> 的格式
+<code>scheme://host:port</code>.</li>
+<li><code>storages</code> Array - 需要清理的 storages 类型, 可以包含 :
+<code>appcache</code>, <code>cookies</code>, <code>filesystem</code>, <code>indexdb</code>, <code>local storage</code>,
+<code>shadercache</code>, <code>websql</code>, <code>serviceworkers</code></li>
+<li><code>quotas</code> Array - 需要清理的类型指标, 可以包含:
+<code>temporary</code>, <code>persistent</code>, <code>syncable</code>.</li>
+</ul>
+</li>
+<li><code>callback</code> Function - 操作完成时调用.</li>
+</ul>
+<p>清除 web storages 的数据.</p>
+<h4><code>ses.flushStorageData()</code></h4>
+<p>将没有写入的 DOMStorage 写入磁盘.</p>
+<h4><code>ses.setProxy(config, callback)</code></h4>
+<ul>
+<li>
+<code>config</code> Object
+<ul>
+<li><code>pacScript</code> String - 与 PAC 文件相关的 URL.</li>
+<li><code>proxyRules</code> String - 代理使用规则.</li>
+</ul>
+</li>
+<li><code>callback</code> Function - 操作完成时调用.</li>
+</ul>
+<p>设置 proxy settings.</p>
+<p>当 <code>pacScript</code> 和 <code>proxyRules</code> 一同提供时，将忽略 <code>proxyRules</code>，并且使用 <code>pacScript</code> 配置 .</p>
+<p><code>proxyRules</code> 需要遵循下面的规则:</p>
+<p><code>proxyRules = schemeProxies[&quot;;&quot;&lt;schemeProxies&gt;]
+schemeProxies = [&lt;urlScheme&gt;&quot;=&quot;]&lt;proxyURIList&gt;
+urlScheme = &quot;http&quot; | &quot;https&quot; | &quot;ftp&quot; | &quot;socks&quot;
+proxyURIList = &lt;proxyURL&gt;[&quot;,&quot;&lt;proxyURIList&gt;]
+proxyURL = [&lt;proxyScheme&gt;&quot;://&quot;]&lt;proxyHost&gt;[&quot;:&quot;&lt;proxyPort&gt;]</code></p>
+<p>例子:</p>
+<ul>
+<li><code>http=foopy:80;ftp=foopy2</code> - 为 <code>http://</code> URL 使用 HTTP 代理 <code>foopy:80</code> , 和为 <code>ftp://</code> URL 
+  HTTP 代理 <code>foopy2:80</code> .</li>
+<li><code>foopy:80</code> - 为所有 URL 使用 HTTP 代理 <code>foopy:80</code> .</li>
+<li><code>foopy:80,bar,direct://</code> - 为所有 URL 使用 HTTP 代理 <code>foopy:80</code> , 如果 <code>foopy:80</code> 不可用，则切换使用  <code>bar</code>, 再往后就不使用代理了.</li>
+<li><code>socks4://foopy</code> - 为所有 URL 使用 SOCKS v4 代理 <code>foopy:1080</code>.</li>
+<li><code>http=foopy,socks5://bar.com</code> - 为所有 URL 使用 HTTP 代理 <code>foopy</code>, 如果 <code>foopy</code>不可用，则切换到 SOCKS5 代理 <code>bar.com</code>.</li>
+<li><code>http=foopy,direct://</code> - 为所有http url 使用 HTTP 代理，如果 <code>foopy</code>不可用，则不使用代理.</li>
+<li><code>http=foopy;socks=foopy2</code> -  为所有http url 使用 <code>foopy</code> 代理，为所有其他 url 使用 <code>socks4://foopy2</code> 代理.</li>
+</ul>
+<h3><code>ses.resolveProxy(url, callback)</code></h3>
+<ul>
+<li><code>url</code> URL</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>解析 <code>url</code> 的代理信息.当请求完成的时候使用 <code>callback(proxy)</code> 调用 <code>callback</code>.</p>
+<h4><code>ses.setDownloadPath(path)</code></h4>
+<ul>
+<li><code>path</code> String - 下载地址</li>
+</ul>
+<p>设置下载保存地址，默认保存地址为各自 app 应用的 <code>Downloads</code>目录.</p>
+<h4><code>ses.enableNetworkEmulation(options)</code></h4>
+<ul>
+<li>
+<code>options</code> Object
+<ul>
+<li><code>offline</code> Boolean - 是否模拟网络故障.</li>
+<li><code>latency</code> Double - 每毫秒的 RTT </li>
+<li><code>downloadThroughput</code> Double - 每 Bps 的下载速率.</li>
+<li><code>uploadThroughput</code> Double - 每 Bps 的上载速率.</li>
+</ul>
+</li>
+</ul>
+<p>通过给定配置的 <code>session</code> 来模拟网络.</p>
+<p>```javascript
+// 模拟 GPRS 连接，使用的 50kbps 流量，500 毫秒的 rtt.
+window.webContents.session.enableNetworkEmulation({
+    latency: 500,
+    downloadThroughput: 6400,
+    uploadThroughput: 6400
+});</p>
+<p>// 模拟网络故障.
+window.webContents.session.enableNetworkEmulation({offline: true});
+```</p>
+<h4><code>ses.disableNetworkEmulation()</code></h4>
+<p>停止所有已经使用 <code>session</code> 的活跃模拟网络.
+重置为原始网络类型.</p>
+<h4><code>ses.setCertificateVerifyProc(proc)</code></h4>
+<ul>
+<li><code>proc</code> Function</li>
+</ul>
+<p>为 <code>session</code> 设置证书验证过程，当请求一个服务器的证书验证时，使用 <code>proc(hostname, certificate, callback)</code> 调用 <code>proc</code>.调用 <code>callback(true)</code> 来接收证书，调用  <code>callback(false)</code> 来拒绝验证证书.</p>
+<p>调用了 <code>setCertificateVerifyProc(null)</code> ，则将会回复到默认证书验证过程.</p>
+<p><code>javascript
+myWindow.webContents.session.setCertificateVerifyProc(function(hostname, cert, callback) {
+  if (hostname == 'github.com')
+    callback(true);
+  else
+    callback(false);
+});</code></p>
+<h4><code>ses.setPermissionRequestHandler(handler)</code></h4>
+<ul>
+<li>
+<code>handler</code> Function
+<ul>
+<li><code>webContents</code> Object - <a href="web-contents.html">WebContents</a> 请求许可.</li>
+<li><code>permission</code>  String - 枚举了 'media', 'geolocation', 'notifications', 'midiSysex', 'pointerLock', 'fullscreen'.</li>
+<li><code>callback</code>  Function - 允许或禁止许可.</li>
+</ul>
+</li>
+</ul>
+<p>为对应 <code>session</code> 许可请求设置响应句柄.调用 <code>callback(true)</code> 接收许可，调用 <code>callback(false)</code> 禁止许可.</p>
+<p>```javascript
+session.fromPartition(partition).setPermissionRequestHandler(function(webContents, permission, callback) {
+  if (webContents.getURL() === host) {
+    if (permission == &quot;notifications&quot;) {
+      callback(false); // denied.
+      return;
+    }
+  }</p>
+<p>callback(true);
+});
+```</p>
+<h4><code>ses.clearHostResolverCache([callback])</code></h4>
+<ul>
+<li><code>callback</code> Function (可选) - 操作结束调用.</li>
+</ul>
+<p>清除主机解析缓存.</p>
+<h4><code>ses.webRequest</code></h4>
+<p>在其生命周期的不同阶段，<code>webRequest</code> API 设置允许拦截并修改请求内容.</p>
+<p>每个 API 接收一可选的 <code>filter</code> 和 <code>listener</code>，当 API 事件发生的时候使用 <code>listener(details)</code> 调用 <code>listener</code>，<code>details</code> 是一个用来描述请求的对象.为 <code>listener</code> 使用 <code>null</code> 则会退定事件.</p>
+<p><code>filter</code> 是一个拥有 <code>urls</code> 属性的对象，这是一个 url 模式数组，这用来过滤掉不匹配指定 url 模式的请求.如果忽略 <code>filter</code> ，那么所有请求都将可以成功匹配.</p>
+<p>所有事件的 <code>listener</code> 都有一个回调事件，当 <code>listener</code> 完成它的工作的时候，它将使用一个 <code>response</code> 对象来调用.</p>
+<p>```javascript
+// 将所有请求的代理都修改为下列 url.
+var filter = {
+  urls: [&quot;https://<em>.github.com/</em>&quot;, &quot;*://electron.github.io&quot;]
+};</p>
+<p>session.defaultSession.webRequest.onBeforeSendHeaders(filter, function(details, callback) {
+  details.requestHeaders['User-Agent'] = &quot;MyAgent&quot;;
+  callback({cancel: false, requestHeaders: details.requestHeaders});
+});
+```</p>
+<h4><code>ses.webRequest.onBeforeRequest([filter, ]listener)</code></h4>
+<ul>
+<li><code>filter</code> Object</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>当一个请求即将开始的时候，使用 <code>listener(details, callback)</code> 调用 <code>listener</code>.</p>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>id</code> Integer</li>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>resourceType</code> String</li>
+<li><code>timestamp</code> Double</li>
+<li><code>uploadData</code> Array (可选)</li>
+</ul>
+</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p><code>uploadData</code> 是一个 <code>data</code> 数组对象:</p>
+<ul>
+<li>
+<code>data</code> Object
+<ul>
+<li><code>bytes</code> Buffer - 被发送的内容.</li>
+<li><code>file</code> String - 上载文件路径.</li>
+</ul>
+</li>
+</ul>
+<p><code>callback</code> 必须使用一个 <code>response</code> 对象来调用:</p>
+<ul>
+<li>
+<code>response</code> Object
+<ul>
+<li><code>cancel</code> Boolean (可选)</li>
+<li><code>redirectURL</code> String (可选) - 原始请求阻止发送或完成，而不是重定向.</li>
+</ul>
+</li>
+</ul>
+<h4><code>ses.webRequest.onBeforeSendHeaders([filter, ]listener)</code></h4>
+<ul>
+<li><code>filter</code> Object</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>一旦请求报文头可用了,在发送 HTTP 请求的之前，使用 <code>listener(details, callback)</code> 调用 <code>listener</code>.这也许会在服务器发起一个tcp 连接，但是在发送任何 http 数据之前发生.</p>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>id</code> Integer</li>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>resourceType</code> String</li>
+<li><code>timestamp</code> Double</li>
+<li><code>requestHeaders</code> Object</li>
+</ul>
+</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>必须使用一个 <code>response</code> 对象来调用 <code>callback</code> :</p>
+<ul>
+<li>
+<code>response</code> Object
+<ul>
+<li><code>cancel</code> Boolean (可选)</li>
+<li><code>requestHeaders</code> Object (可选) - 如果提供了,将使用这些 headers 来创建请求.</li>
+</ul>
+</li>
+</ul>
+<h4><code>ses.webRequest.onSendHeaders([filter, ]listener)</code></h4>
+<ul>
+<li><code>filter</code> Object</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>在一个请求正在发送到服务器的时候，使用 <code>listener(details)</code> 来调用 <code>listener</code> ，之前 <code>onBeforeSendHeaders</code> 修改部分响应可用，同时取消监听.</p>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>id</code> Integer</li>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>resourceType</code> String</li>
+<li><code>timestamp</code> Double</li>
+<li><code>requestHeaders</code> Object</li>
+</ul>
+</li>
+</ul>
+<h4><code>ses.webRequest.onHeadersReceived([filter,] listener)</code></h4>
+<ul>
+<li><code>filter</code> Object</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>当 HTTP 请求报文头已经到达的时候，使用 <code>listener(details, callback)</code> 调用 <code>listener</code> .</p>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>id</code> String</li>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>resourceType</code> String</li>
+<li><code>timestamp</code> Double</li>
+<li><code>statusLine</code> String</li>
+<li><code>statusCode</code> Integer</li>
+<li><code>responseHeaders</code> Object</li>
+</ul>
+</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>必须使用一个 <code>response</code> 对象来调用 <code>callback</code> :</p>
+<ul>
+<li>
+<code>response</code> Object
+<ul>
+<li><code>cancel</code> Boolean</li>
+<li><code>responseHeaders</code> Object (可选) - 如果提供, 服务器将假定使用这些头来响应.</li>
+</ul>
+</li>
+</ul>
+<h4><code>ses.webRequest.onResponseStarted([filter, ]listener)</code></h4>
+<ul>
+<li><code>filter</code> Object</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>当响应body的首字节到达的时候，使用 <code>listener(details)</code> 调用 <code>listener</code>.对 http 请求来说，这意味着状态线和响应头可用了.</p>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>id</code> Integer</li>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>resourceType</code> String</li>
+<li><code>timestamp</code> Double</li>
+<li><code>responseHeaders</code> Object</li>
+<li><code>fromCache</code> Boolean  - 标识响应是否来自磁盘
+cache.</li>
+<li><code>statusCode</code> Integer</li>
+<li><code>statusLine</code> String</li>
+</ul>
+</li>
+</ul>
+<h4><code>ses.webRequest.onBeforeRedirect([filter, ]listener)</code></h4>
+<ul>
+<li><code>filter</code> Object</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>当服务器的重定向初始化正要启动时，使用 <code>listener(details)</code> 调用 <code>listener</code>.</p>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>id</code> String</li>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>resourceType</code> String</li>
+<li><code>timestamp</code> Double</li>
+<li><code>redirectURL</code> String</li>
+<li><code>statusCode</code> Integer</li>
+<li><code>ip</code> String (可选) - 请求的真实服务器ip 地址</li>
+<li><code>fromCache</code> Boolean</li>
+<li><code>responseHeaders</code> Object</li>
+</ul>
+</li>
+</ul>
+<h4><code>ses.webRequest.onCompleted([filter, ]listener)</code></h4>
+<ul>
+<li><code>filter</code> Object</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>当请求完成的时候，使用 <code>listener(details)</code> 调用 <code>listener</code>.</p>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>id</code> Integer</li>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>resourceType</code> String</li>
+<li><code>timestamp</code> Double</li>
+<li><code>responseHeaders</code> Object</li>
+<li><code>fromCache</code> Boolean</li>
+<li><code>statusCode</code> Integer</li>
+<li><code>statusLine</code> String</li>
+</ul>
+</li>
+</ul>
+<h4><code>ses.webRequest.onErrorOccurred([filter, ]listener)</code></h4>
+<ul>
+<li><code>filter</code> Object</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>当一个错误发生的时候，使用 <code>listener(details)</code> 调用 <code>listener</code>.</p>
+<ul>
+<li>
+<code>details</code> Object
+<ul>
+<li><code>id</code> Integer</li>
+<li><code>url</code> String</li>
+<li><code>method</code> String</li>
+<li><code>resourceType</code> String</li>
+<li><code>timestamp</code> Double</li>
+<li><code>fromCache</code> Boolean</li>
+<li><code>error</code> String - 错误描述.</li>
+</ul>
+</li>
+</ul>

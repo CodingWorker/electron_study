@@ -1,0 +1,51 @@
+<h1>ipc (主进程)</h1>
+<p>在主进程使用<code>ipc</code>模块时,<code>ipc</code>负责捕获从渲染进程(网页)发送的同步或者是异步消息.</p>
+<h2>发送消息</h2>
+<p>主进程也可以向渲染进程发送信息,具体可以看<a href="web-contents.md#webcontentssendchannel-args">WebContents.send</a>.</p>
+<ul>
+<li>当发送消息的时候,事件名字为<code>channel</code>.</li>
+<li>回复一个同步消息的时候,你需要使用<code>event.returnValue</code></li>
+<li>回复一个异步消息的时候,使用<code>event.sender.send(...)</code></li>
+</ul>
+<p>下面是一个主进程和渲染进程的通信例子.</p>
+<p>```javascript
+// 在主进程中.
+var ipc = require('ipc');
+ipc.on('asynchronous-message', function(event, arg) {
+  console.log(arg);  // 打印 &quot;ping&quot;
+  event.sender.send('asynchronous-reply', 'pong');
+});</p>
+<p>ipc.on('synchronous-message', function(event, arg) {
+  console.log(arg);  // 打印 &quot;ping&quot;
+  event.returnValue = 'pong';
+});
+```</p>
+<p>```javascript
+// 在渲染进程(网页).
+var ipc = require('ipc');
+console.log(ipc.sendSync('synchronous-message', 'ping')); // 打印 &quot;pong&quot;</p>
+<p>ipc.on('asynchronous-reply', function(arg) {
+  console.log(arg); // 打印 &quot;pong&quot;
+});
+ipc.send('asynchronous-message', 'ping');
+```</p>
+<h2>监听消息</h2>
+<p><code>ipc</code>模块有下列几种方法来监听事件.</p>
+<h3><code>ipc.on(channel, callback)</code></h3>
+<ul>
+<li><code>channel</code> - 事件名称.</li>
+<li><code>callback</code> - 回调函数.</li>
+</ul>
+<p>当事件发生的时候,会传入<code>callback</code> <code>event</code>和<code>arg</code>参数.</p>
+<h2>IPC 事件</h2>
+<p>传入<code>callback</code>的<code>event</code>对象含有下列方法.</p>
+<h3><code>Event.returnValue</code></h3>
+<p>在同步消息中,设置这个值将会被返回.</p>
+<h3><code>Event.sender</code></h3>
+<p>返回一个可以发送消息的<code>WebContents</code>.</p>
+<h3><code>Event.sender.send(channel[.arg1][,arg2][,...])</code></h3>
+<ul>
+<li><code>channel</code> - 事件名称.</li>
+<li><code>arg</code> (选用)</li>
+</ul>
+<p>这个可以发送一个可带参数的异步消息回渲染进程.</p>

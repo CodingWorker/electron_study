@@ -1,0 +1,49 @@
+<h1>菜单项</h1>
+<p>菜单项模块允许你向应用或<a href="https://github.com/heyunjiang/electron/blob/master/docs-translations/zh-CN/api/menu.html">menu</a>添加选项。</p>
+<p>查看<a href="https://github.com/heyunjiang/electron/blob/master/docs-translations/zh-CN/api/menu.html">menu</a>例子。</p>
+<h2>类：MenuItem</h2>
+<p>使用下面的方法创建一个新的 <code>MenuItem</code></p>
+<h3>new MenuItem(options)</h3>
+<ul>
+<li>
+<code>options</code> Object
+<ul>
+<li><code>click</code> Function - 当菜单项被点击的时候，使用 <code>click(menuItem,browserWindow)</code> 调用</li>
+<li><code>role</code> String - 定义菜单项的行为，在指定 <code>click</code> 属性时将会被忽略</li>
+<li><code>type</code> String - 取值 <code>normal</code>，<code>separator</code>，<code>checkbox</code>or<code>radio</code></li>
+<li><code>label</code> String</li>
+<li><code>sublabel</code> String</li>
+<li><code>accelerator</code> <a href="https://github.com/heyunjiang/electron/blob/master/docs/api/accelerator.html">Accelerator</a></li>
+<li><code>icon</code> <a href="https://github.com/heyunjiang/electron/blob/master/docs/api/native-image.html">NativeImage</a></li>
+<li><code>enabled</code> Boolean</li>
+<li><code>visible</code> Boolean</li>
+<li><code>checked</code> Boolean</li>
+<li><code>submenu</code> Menu - 应当作为 <code>submenu</code> 菜单项的特定类型，当它作为 <code>type: 'submenu'</code> 菜单项的特定类型时可以忽略。如果它的值不是 <code>Menu</code>，将自动转为 <code>Menu.buildFromTemplate</code>。</li>
+<li><code>id</code> String - 标志一个菜单的唯一性。如果被定义使用，它将被用作这个菜单项的参考位置属性。</li>
+<li><code>position</code> String - 定义给定的菜单的具体指定位置信息。</li>
+</ul>
+</li>
+</ul>
+<p>在创建菜单项时，如果有匹配的方法，建议指定 <code>role</code> 属性，不需要人为操作它的行为，这样菜单使用可以给用户最好的体验。</p>
+<p><code>role</code>属性值可以为：</p>
+<ul>
+<li><code>undo</code></li>
+<li><code>redo</code></li>
+<li><code>cut</code></li>
+<li><code>copy</code></li>
+<li><code>paste</code></li>
+<li><code>selectall</code></li>
+<li><code>minimize</code> - 最小化当前窗口</li>
+<li><code>close</code> - 关闭当前窗口</li>
+</ul>
+<p>在 OS X 上，<code>role</code> 还可以有以下值：</p>
+<ul>
+<li><code>about</code> - 匹配 <code>orderFrontStandardAboutPanel</code> 行为</li>
+<li><code>hide</code> - 匹配 <code>hide</code> 行为</li>
+<li><code>hideothers</code> - 匹配 <code>hideOtherApplications</code> 行为</li>
+<li><code>unhide</code> - 匹配 <code>unhideAllApplications</code> 行为</li>
+<li><code>front</code> - 匹配 <code>arrangeInFront</code> 行为</li>
+<li><code>window</code> - &quot;Window&quot; 菜单项</li>
+<li><code>help</code> - &quot;Help&quot; 菜单项</li>
+<li><code>services</code> - &quot;Services&quot; 菜单项</li>
+</ul>

@@ -1,0 +1,56 @@
+<h1>desktopCapturer</h1>
+<p><code>desktopCapturer</code> 模块可用来获取可用资源，这个资源可通过 <code>getUserMedia</code> 捕获得到.</p>
+<p>```javascript
+// 在渲染进程中.
+var desktopCapturer = require('electron').desktopCapturer;</p>
+<p>desktopCapturer.getSources({types: ['window', 'screen']}, function(error, sources) {
+  if (error) throw error;
+  for (var i = 0; i &lt; sources.length; ++i) {
+    if (sources[i].name == &quot;Electron&quot;) {
+      navigator.webkitGetUserMedia({
+        audio: false,
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: sources[i].id,
+            minWidth: 1280,
+            maxWidth: 1280,
+            minHeight: 720,
+            maxHeight: 720
+          }
+        }
+      }, gotStream, getUserMediaError);
+      return;
+    }
+  }
+});</p>
+<p>function gotStream(stream) {
+  document.querySelector('video').src = URL.createObjectURL(stream);
+}</p>
+<p>function getUserMediaError(e) {
+  console.log('getUserMediaError');
+}
+```</p>
+<p>当调用 <code>navigator.webkitGetUserMedia</code> 时创建一个约束对象，如果使用 <code>desktopCapturer</code> 的资源，必须设置 <code>chromeMediaSource</code> 为 <code>&quot;desktop&quot;</code> ，并且 <code>audio</code> 为 <code>false</code>.</p>
+<p>如果你想捕获整个桌面的 audio 和 video，你可以设置 <code>chromeMediaSource</code> 为 <code>&quot;screen&quot;</code> ，和 <code>audio</code> 为 <code>true</code>.
+当使用这个方法的时候，不可以指定一个 <code>chromeMediaSourceId</code>.</p>
+<h2>方法</h2>
+<p><code>desktopCapturer</code> 模块有如下方法:</p>
+<h3><code>desktopCapturer.getSources(options, callback)</code></h3>
+<ul>
+<li>
+<code>options</code> Object
+<ul>
+<li><code>types</code> Array - 一个 String 数组，列出了可以捕获的桌面资源类型, 可用类型为 <code>screen</code> 和 <code>window</code>.</li>
+<li><code>thumbnailSize</code> Object (可选) - 建议缩略可被缩放的 size, 默认为 <code>{width: 150, height: 150}</code>.</li>
+</ul>
+</li>
+<li><code>callback</code> Function</li>
+</ul>
+<p>发起一个请求，获取所有桌面资源，当请求完成的时候使用 <code>callback(error, sources)</code> 调用  <code>callback</code> .</p>
+<p><code>sources</code> 是一个 <code>Source</code> 对象数组, 每个 <code>Source</code> 表示了一个捕获的屏幕或单独窗口，并且有如下属性 :
+* <code>id</code> String - 在 <code>navigator.webkitGetUserMedia</code> 中使用的捕获窗口或屏幕的 id . 格式为 <code>window:XX</code> 祸
+  <code>screen:XX</code>，<code>XX</code> 是一个随机数.
+* <code>name</code> String - 捕获窗口或屏幕的描述名 . 如果资源为屏幕，名字为 <code>Entire Screen</code> 或 <code>Screen &lt;index&gt;</code>; 如果资源为窗口, 名字为窗口的标题.
+* <code>thumbnail</code> <a href="NativeImage.html">NativeImage</a> - 缩略图.</p>
+<p><strong>注意:</strong> 不能保证 <code>source.thumbnail</code> 的 size 和 <code>options</code> 中的 <code>thumnbailSize</code> 一直一致. 它也取决于屏幕或窗口的缩放比例.</p>

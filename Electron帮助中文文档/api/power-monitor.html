@@ -1,0 +1,22 @@
+<h1>powerMonitor</h1>
+<p><code>power-monitor</code>模块是用来监听能源区改变的.只能在主进程中使用.在 <code>app</code> 模块的 <code>ready</code> 事件触发之后就不能使用这个模块了.</p>
+<p>例如:</p>
+<p><code>javascript
+app.on('ready', function() {
+  require('electron').powerMonitor.on('suspend', function() {
+    console.log('The system is going to sleep');
+  });
+});</code></p>
+<h2>事件</h2>
+<p><code>power-monitor</code> 模块可以触发下列事件:</p>
+<h3>Event: 'suspend'</h3>
+<p>在系统挂起的时候触发.</p>
+<h3>Event: 'resume'</h3>
+<p>在系统恢复继续工作的时候触发.
+Emitted when system is resuming.</p>
+<h3>Event: 'on-ac'</h3>
+<p>在系统使用交流电的时候触发.
+Emitted when the system changes to AC power.</p>
+<h3>Event: 'on-battery'</h3>
+<p>在系统使用电池电源的时候触发.
+Emitted when system changes to battery power.</p>

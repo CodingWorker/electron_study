@@ -1,0 +1,49 @@
+<h1>使用 Widevine CDM 插件</h1>
+<p>在 Electron ，你可以使用 Widevine CDM 插件装载 Chrome 浏览器 .</p>
+<h2>获取插件</h2>
+<p>Electron 没有为 Widevine CDM 插件 配制许可 reasons, 为了获得它，首先需要安装官方的 chrome 浏览器，这匹配了体系架构和 Electron 构建使用的 chrome 版本 .</p>
+<p><strong>注意:</strong> Chrome 浏览器的主要版本必须和 Electron 使用的版本一样，否则插件不会有效，虽然 <code>navigator.plugins</code> 会显示你已经安装了它 .</p>
+<h3>Windows &amp; OS X</h3>
+<p>在 Chrome 浏览器中打开 <code>chrome://components/</code> ，找到 <code>WidevineCdm</code> 并且确定它更新到最新版本，然后你可以从 <code>APP_DATA/Google/Chrome/WidevineCDM/VERSION/_platform_specific/PLATFORM_ARCH/</code> 路径找到所有的插件二进制文件 .</p>
+<p><code>APP_DATA</code> 是系统存放数据的地方，在 Windows 上它是
+<code>%LOCALAPPDATA%</code>, 在 OS X 上它是 <code>~/Library/Application Support</code>. <code>VERSION</code> 是
+Widevine CDM 插件的版本字符串, 类似 <code>1.4.8.866</code>. <code>PLATFORM</code> 是 <code>mac</code> 或
+<code>win</code>. <code>ARCH</code> 是 <code>x86</code> 或 <code>x64</code>.</p>
+<p>在 Windows，必要的二进制文件是 <code>widevinecdm.dll</code> and
+<code>widevinecdmadapter.dll</code>, 在 OS X ，它们是 <code>libwidevinecdm.dylib</code> 和
+<code>widevinecdmadapter.plugin</code>. 你可以将它们复制到任何你喜欢的地方，但是它们必须要放在一起.</p>
+<h3>Linux</h3>
+<p>在 Linux ，Chrome 浏览器将插件的二进制文件装载在一起 , 你可以在 <code>/opt/google/chrome</code> 下找到,文件名是 <code>libwidevinecdm.so</code> 和
+<code>libwidevinecdmadapter.so</code>.</p>
+<h2>使用插件</h2>
+<p>在获得了插件文件后，你可以使用 <code>--widevine-cdm-path</code> 命令行开关来将 <code>widevinecdmadapter</code> 的路径传递给 Electron , 插件版本使用 <code>--widevine-cdm-version</code> 开关.</p>
+<p><strong>注意:</strong> 虽然只有 <code>widevinecdmadapter</code> 的二进制文件传递给了  Electron,  <code>widevinecdm</code> 二进制文件应当放在它的旁边.</p>
+<p>必须在 <code>app</code> 模块的 <code>ready</code> 事件触发之前使用命令行开关，并且 page 使用的插件必须激活.</p>
+<p>示例代码 :</p>
+<p>```javascript
+// You have to pass the filename of <code>widevinecdmadapter</code> here, it is
+// * <code>widevinecdmadapter.plugin</code> on OS X,
+// * <code>libwidevinecdmadapter.so</code> on Linux,
+// * <code>widevinecdmadapter.dll</code> on Windows.
+app.commandLine.appendSwitch('widevine-cdm-path', '/path/to/widevinecdmadapter.plugin');
+// The version of plugin can be got from <code>chrome://plugins</code> page in Chrome.
+app.commandLine.appendSwitch('widevine-cdm-version', '1.4.8.866');</p>
+<p>var mainWindow = null;
+app.on('ready', function() {
+  mainWindow = new BrowserWindow({
+    webPreferences: {
+      // The <code>plugins</code> have to be enabled.
+      plugins: true
+    }
+  })
+});
+```</p>
+<h2>验证插件</h2>
+<p>为了验证插件是否工作，你可以使用下面的方法 :</p>
+<ul>
+<li>打开开发者工具查看是否 <code>navigator.plugins</code> 包含了 Widevine
+CDM 插件.</li>
+<li>打开 <code>https://shaka-player-demo.appspot.com/</code> 加载一个使用
+<code>Widevine</code> 的 manifest.</li>
+<li>打开 http://www.dash-player.com/demo/drm-test-area/, 检查是否界面输出 <code>bitdash uses Widevine in your browser</code>, 然后播放 video.</li>
+</ul>

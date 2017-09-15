@@ -1,0 +1,31 @@
+<h1>环境变量</h1>
+<p>一些 Electron 的行为受到环境变量的控制，因为他们的初始化比命令行和应用代码更早.</p>
+<p>POSIX shells 的例子:</p>
+<p><code>bash
+$ export ELECTRON_ENABLE_LOGGING=true
+$ electron</code></p>
+<p>Windows 控制台:</p>
+<p>```powershell</p>
+<blockquote>
+<p>set ELECTRON<em>ENABLE</em>LOGGING=true
+electron
+```</p>
+</blockquote>
+<h2><code>ELECTRON_RUN_AS_NODE</code></h2>
+<p>类似node.js普通进程启动方式.</p>
+<h2><code>ELECTRON_ENABLE_LOGGING</code></h2>
+<p>打印 Chrome 的内部日志到控制台.</p>
+<h2><code>ELECTRON_LOG_ASAR_READS</code></h2>
+<p>当 Electron 读取 ASA 文档，把 read offset 和文档路径做日志记录到系统 <code>tmpdir</code>.结果文件将提供给 ASAR 模块来优化文档组织.</p>
+<h2><code>ELECTRON_ENABLE_STACK_DUMPING</code></h2>
+<p>当 Electron 崩溃的时候，打印堆栈记录到控制台.</p>
+<p>如果 <code>crashReporter</code> 已经启动那么这个环境变量实效.</p>
+<h2><code>ELECTRON_DEFAULT_ERROR_MODE</code> <em>Windows</em></h2>
+<p>当 Electron 崩溃的时候，显示windows的崩溃对话框.</p>
+<p>如果 <code>crashReporter</code> 已经启动那么这个环境变量实效.</p>
+<h2><code>ELECTRON_NO_ATTACH_CONSOLE</code> <em>Windows</em></h2>
+<p>不可使用当前控制台.</p>
+<h2><code>ELECTRON_FORCE_WINDOW_MENU_BAR</code> <em>Linux</em></h2>
+<p>不可再 Linux 上使用全局菜单栏.</p>
+<h2><code>ELECTRON_HIDE_INTERNAL_MODULES</code></h2>
+<p>关闭旧的内置模块如 <code>require('ipc')</code> 的通用模块.</p>

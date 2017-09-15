@@ -1,0 +1,73 @@
+<h1>webFrame</h1>
+<p><code>web-frame</code> 模块允许你自定义如何渲染当前网页 .</p>
+<p>例子，放大当前页到 200%.</p>
+<p>```javascript
+var webFrame = require('electron').webFrame;</p>
+<p>webFrame.setZoomFactor(2);
+```</p>
+<h2>方法</h2>
+<p><code>web-frame</code> 模块有如下方法:</p>
+<h3><code>webFrame.setZoomFactor(factor)</code></h3>
+<ul>
+<li><code>factor</code> Number - 缩放参数.</li>
+</ul>
+<p>将缩放参数修改为指定的参数值.缩放参数是百分制的，所以 300% = 3.0.</p>
+<h3><code>webFrame.getZoomFactor()</code></h3>
+<p>返回当前缩放参数值.</p>
+<h3><code>webFrame.setZoomLevel(level)</code></h3>
+<ul>
+<li><code>level</code> Number - 缩放水平</li>
+</ul>
+<p>将缩放水平修改为指定的水平值. 原始 size 为 0 ，并且每次增长都表示放大 20% 或缩小 20%，默认限制为原始 size 的 300% 到 50% 之间 .</p>
+<h3><code>webFrame.getZoomLevel()</code></h3>
+<p>返回当前缩放水平值.</p>
+<h3><code>webFrame.setZoomLevelLimits(minimumLevel, maximumLevel)</code></h3>
+<ul>
+<li><code>minimumLevel</code> Number</li>
+<li><code>maximumLevel</code> Number</li>
+</ul>
+<p>设置缩放水平的最大值和最小值.</p>
+<h3><code>webFrame.setSpellCheckProvider(language, autoCorrectWord, provider)</code></h3>
+<ul>
+<li><code>language</code> String</li>
+<li><code>autoCorrectWord</code> Boolean</li>
+<li><code>provider</code> Object</li>
+</ul>
+<p>为输入框或文本域设置一个拼写检查 provider .</p>
+<p><code>provider</code> 必须是一个对象，它有一个 <code>spellCheck</code> 方法，这个方法返回扫过的单词是否拼写正确 .</p>
+<p>例子，使用 <a href="https://github.com/atom/node-spellchecker">node-spellchecker</a> 作为一个 provider:</p>
+<p><code>javascript
+webFrame.setSpellCheckProvider(&quot;en-US&quot;, true, {
+  spellCheck: function(text) {
+    return !(require('spellchecker').isMisspelled(text));
+  }
+});</code></p>
+<h3><code>webFrame.registerURLSchemeAsSecure(scheme)</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+</ul>
+<p>注册 <code>scheme</code> 为一个安全的 scheme.</p>
+<p>安全的 schemes 不会引发混合内容 warnings.例如, <code>https</code> 和
+<code>data</code> 是安全的 schemes ，因为它们不能被活跃网络攻击而失效.</p>
+<h3><code>webFrame.registerURLSchemeAsBypassingCSP(scheme)</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+</ul>
+<p>忽略当前网页内容的安全策略，直接从 <code>scheme</code> 加载.</p>
+<h3><code>webFrame.registerURLSchemeAsPrivileged(scheme)</code></h3>
+<ul>
+<li><code>scheme</code> String</li>
+</ul>
+<p>通过资源的内容安全策略，注册 <code>scheme</code> 为安全的 scheme，允许注册 ServiceWorker并且支持 fetch API.</p>
+<h3><code>webFrame.insertText(text)</code></h3>
+<ul>
+<li><code>text</code> String</li>
+</ul>
+<p>向获得焦点的原色插入内容 .</p>
+<h3><code>webFrame.executeJavaScript(code[, userGesture])</code></h3>
+<ul>
+<li><code>code</code> String</li>
+<li><code>userGesture</code> Boolean (可选) - 默认为 <code>false</code>.</li>
+</ul>
+<p>评估页面代码 .</p>
+<p>在浏览器窗口中，一些 HTML APIs ，例如 <code>requestFullScreen</code>，只可以通过用户手势来使用.设置<code>userGesture</code> 为 <code>true</code> 可以突破这个限制 .</p>

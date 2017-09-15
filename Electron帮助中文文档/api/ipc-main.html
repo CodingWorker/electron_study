@@ -1,0 +1,64 @@
+<h1>ipcMain</h1>
+<p><code>ipcMain</code> 模块是类
+<a href="https://nodejs.org/api/events.html">EventEmitter</a> 的实例.当在主进程中使用它的时候，它控制着由渲染进程(web page)发送过来的异步或同步消息.从渲染进程发送过来的消息将触发事件.</p>
+<h2>发送消息</h2>
+<p>同样也可以从主进程向渲染进程发送消息，查看更多 <a href="web-contents.md#webcontentssendchannel-arg1-arg2-">webContents.send</a> .</p>
+<ul>
+<li>发送消息，事件名为 <code>channel</code>.</li>
+<li>回应同步消息, 你可以设置 <code>event.returnValue</code>.</li>
+<li>回应异步消息, 你可以使用
+  <code>event.sender.send(...)</code>.</li>
+</ul>
+<p>一个例子，在主进程和渲染进程之间发送和处理消息:</p>
+<p>```javascript
+// In main process.
+const ipcMain = require('electron').ipcMain;
+ipcMain.on('asynchronous-message', function(event, arg) {
+  console.log(arg);  // prints &quot;ping&quot;
+  event.sender.send('asynchronous-reply', 'pong');
+});</p>
+<p>ipcMain.on('synchronous-message', function(event, arg) {
+  console.log(arg);  // prints &quot;ping&quot;
+  event.returnValue = 'pong';
+});
+```</p>
+<p>```javascript
+// In renderer process (web page).
+const ipcRenderer = require('electron').ipcRenderer;
+console.log(ipcRenderer.sendSync('synchronous-message', 'ping')); // prints &quot;pong&quot;</p>
+<p>ipcRenderer.on('asynchronous-reply', function(event, arg) {
+  console.log(arg); // prints &quot;pong&quot;
+});
+ipcRenderer.send('asynchronous-message', 'ping');
+```</p>
+<h2>监听消息</h2>
+<p><code>ipcMain</code> 模块有如下监听事件方法:</p>
+<h3><code>ipcMain.on(channel, listener)</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>监听 <code>channel</code>, 当新消息到达，将通过 <code>listener(event, args...)</code> 调用 <code>listener</code>.</p>
+<h3><code>ipcMain.once(channel, listener)</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>为事件添加一个一次性用的<code>listener</code> 函数.这个 <code>listener</code> 只有在下次的消息到达 <code>channel</code> 时被请求调用，之后就被删除了.</p>
+<h3><code>ipcMain.removeListener(channel, listener)</code></h3>
+<ul>
+<li><code>channel</code> String</li>
+<li><code>listener</code> Function</li>
+</ul>
+<p>为特定的 <code>channel</code> 从监听队列中删除特定的 <code>listener</code> 监听者.</p>
+<h3><code>ipcMain.removeAllListeners([channel])</code></h3>
+<ul>
+<li><code>channel</code> String (可选)</li>
+</ul>
+<p>删除所有监听者，或特指的 <code>channel</code> 的所有监听者.</p>
+<h2>事件对象</h2>
+<p>传递给 <code>callback</code> 的 <code>event</code> 对象有如下方法:</p>
+<h3><code>event.returnValue</code></h3>
+<p>将此设置为在一个同步消息中返回的值.</p>
+<h3><code>event.sender</code></h3>
+<p>返回发送消息的 <code>webContents</code> ，你可以调用 <code>event.sender.send</code>  来回复异步消息，更多信息 <a href="web-contents.md#webcontentssendchannel-arg1-arg2-">webContents.send</a>.</p>

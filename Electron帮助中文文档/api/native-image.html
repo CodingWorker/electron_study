@@ -1,0 +1,94 @@
+<h1>nativeImage</h1>
+<p>在 Electron 中, 对所有创建 images 的 api 来说, 你可以使用文件路径或 <code>nativeImage</code> 实例. 如果使用 <code>null</code> ，将创建一个空的image 对象.</p>
+<p>例如, 当创建一个 tray 或设置窗口的图标时候，你可以使用一个字符串的图片路径 :</p>
+<p><code>javascript
+var appIcon = new Tray('/Users/somebody/images/icon.png');
+var window = new BrowserWindow({icon: '/Users/somebody/images/window.png'});</code></p>
+<p>或者从剪切板中读取图片，它返回的是 <code>nativeImage</code>:</p>
+<p><code>javascript
+var image = clipboard.readImage();
+var appIcon = new Tray(image);</code></p>
+<h2>支持的格式</h2>
+<p>当前支持 <code>PNG</code> 和 <code>JPEG</code> 图片格式. 推荐 <code>PNG</code> ，因为它支持透明和无损压缩.</p>
+<p>在 Windows, 你也可以使用 <code>ICO</code> 图标的格式.</p>
+<h2>高分辨率图片</h2>
+<p>如果平台支持 high-DPI，你可以在图片基础路径后面添加 <code>@2x</code> ，可以标识它为高分辨率的图片.</p>
+<p>例如，如果 <code>icon.png</code> 是一个普通图片并且拥有标准分辨率，然后 <code>icon@2x.png</code>将被当作高分辨率的图片处理，它将拥有双倍 DPI 密度.</p>
+<p>如果想同时支持展示不同分辨率的图片，你可以将拥有不同size 的图片放在同一个文件夹下，不用 DPI 后缀.例如 :</p>
+<p><code>text
+images/
+├── icon.png
+├── icon@2x.png
+└── icon@3x.png</code></p>
+<p><code>javascript
+var appIcon = new Tray('/Users/somebody/images/icon.png');</code></p>
+<p>也支持下面这些 DPI 后缀:</p>
+<ul>
+<li><code>@1x</code></li>
+<li><code>@1.25x</code></li>
+<li><code>@1.33x</code></li>
+<li><code>@1.4x</code></li>
+<li><code>@1.5x</code></li>
+<li><code>@1.8x</code></li>
+<li><code>@2x</code></li>
+<li><code>@2.5x</code></li>
+<li><code>@3x</code></li>
+<li><code>@4x</code></li>
+<li><code>@5x</code></li>
+</ul>
+<h2>模板图片</h2>
+<p>模板图片由黑色和清色(和一个 alpha 通道)组成.
+模板图片不是单独使用的，而是通常和其它内容混合起来创建期望的最终效果.</p>
+<p>最常见的用力是将模板图片用到菜单栏图片上，所以它可以同时适应亮、黑不同的菜单栏.</p>
+<p><strong>注意:</strong> 模板图片只在 OS X 上可用.</p>
+<p>为了将图片标识为一个模板图片，它的文件名应当以 <code>Template</code> 结尾. 例如:</p>
+<ul>
+<li><code>xxxTemplate.png</code></li>
+<li><code>xxxTemplate@2x.png</code></li>
+</ul>
+<h2>方法</h2>
+<p><code>nativeImage</code> 类有如下方法:</p>
+<h3><code>nativeImage.createEmpty()</code></h3>
+<p>创建一个空的 <code>nativeImage</code> 实例.</p>
+<h3><code>nativeImage.createFromPath(path)</code></h3>
+<ul>
+<li><code>path</code> String</li>
+</ul>
+<p>从指定 <code>path</code> 创建一个新的 <code>nativeImage</code> 实例 .</p>
+<h3><code>nativeImage.createFromBuffer(buffer[, scaleFactor])</code></h3>
+<ul>
+<li><code>buffer</code> <a href="https://nodejs.org/api/buffer.html#buffer_class_buffer">Buffer</a></li>
+<li><code>scaleFactor</code> Double (可选)</li>
+</ul>
+<p>从 <code>buffer</code> 创建一个新的 <code>nativeImage</code> 实例 .默认  <code>scaleFactor</code> 是 1.0.</p>
+<h3><code>nativeImage.createFromDataURL(dataURL)</code></h3>
+<ul>
+<li><code>dataURL</code> String</li>
+</ul>
+<p>从 <code>dataURL</code> 创建一个新的 <code>nativeImage</code> 实例 .</p>
+<h2>实例方法</h2>
+<p><code>nativeImage</code> 有如下方法:</p>
+<p>```javascript
+const nativeImage = require('electron').nativeImage;</p>
+<p>var image = nativeImage.createFromPath('/Users/somebody/images/icon.png');
+```</p>
+<h3><code>image.toPng()</code></h3>
+<p>返回一个 <a href="https://nodejs.org/api/buffer.html#buffer_class_buffer">Buffer</a> ，它包含了图片的 <code>PNG</code> 编码数据.</p>
+<h3><code>image.toJpeg(quality)</code></h3>
+<ul>
+<li><code>quality</code> Integer (<strong>必须</strong>) - 在 0 - 100 之间.</li>
+</ul>
+<p>返回一个 <a href="https://nodejs.org/api/buffer.html#buffer_class_buffer">Buffer</a> ，它包含了图片的 <code>JPEG</code> 编码数据.</p>
+<h3><code>image.toDataURL()</code></h3>
+<p>返回图片数据的 URL.</p>
+<h3><code>image.isEmpty()</code></h3>
+<p>返回一个 boolean ，标识图片是否为空.</p>
+<h3><code>image.getSize()</code></h3>
+<p>返回图片的 size.</p>
+<h3><code>image.setTemplateImage(option)</code></h3>
+<ul>
+<li><code>option</code> Boolean</li>
+</ul>
+<p>将图片标识为模板图片.</p>
+<h3><code>image.isTemplateImage()</code></h3>
+<p>返回一个 boolean ，标识图片是否是模板图片.</p>

@@ -1,0 +1,97 @@
+
+<h1>clipboard</h1>
+<p><code>clipboard</code> 模块提供方法来供复制和粘贴操作 .
+下面例子展示了如何将一个字符串写道 clipboard 上:</p>
+<p><code>javascript
+const clipboard = require('electron').clipboard;
+clipboard.writeText('Example String');</code></p>
+<p>在 X Window 系统上, 有一个可选的 clipboard. 你可以为每个方法使用 <code>selection</code> 来控制它:</p>
+<p><code>javascript
+clipboard.writeText('Example String', 'selection');
+console.log(clipboard.readText('selection'));</code></p>
+<h2>方法</h2>
+<p><code>clipboard</code> 模块有以下方法:</p>
+<p><strong>注意:</strong> 测试 APIs 已经标明，并且在将来会被删除 .</p>
+<h3><code>clipboard.readText([type])</code></h3>
+<ul>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>以纯文本形式从 clipboard 返回内容 .</p>
+<h3><code>clipboard.writeText(text[, type])</code></h3>
+<ul>
+<li><code>text</code> String</li>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>以纯文本形式向 clipboard 添加内容 .</p>
+<h3><code>clipboard.readHtml([type])</code></h3>
+<ul>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>返回 clipboard 中的标记内容.</p>
+<h3><code>clipboard.writeHtml(markup[, type])</code></h3>
+<ul>
+<li><code>markup</code> String</li>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>向 clipboard 添加 <code>markup</code> 内容 .</p>
+<h3><code>clipboard.readImage([type])</code></h3>
+<ul>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>从 clipboard 中返回 <a href="native-image.html">NativeImage</a> 内容.</p>
+<h3><code>clipboard.writeImage(image[, type])</code></h3>
+<ul>
+<li><code>image</code> <a href="native-image.html">NativeImage</a></li>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>向 clipboard 中写入 <code>image</code> .</p>
+<h3><code>clipboard.readRtf([type])</code></h3>
+<ul>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>从 clipboard 中返回 RTF 内容. </p>
+<h3><code>clipboard.writeRtf(text[, type])</code></h3>
+<ul>
+<li><code>text</code> String</li>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>向 clipboard 中写入 RTF 格式的 <code>text</code> .</p>
+<h3><code>clipboard.clear([type])</code></h3>
+<ul>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>清空 clipboard 内容.</p>
+<h3><code>clipboard.availableFormats([type])</code></h3>
+<ul>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>返回 clipboard 支持的格式数组 .</p>
+<h3><code>clipboard.has(data[, type])</code> <em>Experimental</em></h3>
+<ul>
+<li><code>data</code> String</li>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>返回 clipboard 是否支持指定 <code>data</code> 的格式.</p>
+<p><code>javascript
+console.log(clipboard.has('&lt;p&gt;selection&lt;/p&gt;'));</code></p>
+<h3><code>clipboard.read(data[, type])</code> <em>Experimental</em></h3>
+<ul>
+<li><code>data</code> String</li>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p>读取 clipboard 的 <code>data</code>.</p>
+<h3><code>clipboard.write(data[, type])</code></h3>
+<ul>
+<li>
+<code>data</code> Object
+<ul>
+<li><code>text</code> String</li>
+<li><code>html</code> String</li>
+<li><code>image</code> <a href="native-image.html">NativeImage</a></li>
+</ul>
+</li>
+<li><code>type</code> String (可选)</li>
+</ul>
+<p><code>javascript
+clipboard.write({text: 'test', html: &quot;&lt;b&gt;test&lt;/b&gt;&quot;});</code>
+向 clipboard 写入 <code>data</code> .</p>

@@ -1,0 +1,52 @@
+<h1>crashReporter</h1>
+<p><code>crash-reporter</code> 模块开启发送应用崩溃报告.</p>
+<p>下面是一个自动提交崩溃报告给服务器的例子 :</p>
+<p>```javascript
+const crashReporter = require('electron').crashReporter;</p>
+<p>crashReporter.start({
+  productName: 'YourName',
+  companyName: 'YourCompany',
+  submitURL: 'https://your-domain.com/url-to-submit',
+  autoSubmit: true
+});
+```</p>
+<h2>方法</h2>
+<p><code>crash-reporter</code> 模块有如下方法:</p>
+<h3><code>crashReporter.start(options)</code></h3>
+<ul>
+<li>
+<code>options</code> Object
+<ul>
+<li><code>companyName</code> String</li>
+<li><code>submitURL</code> String - 崩溃报告发送的路径，以post方式.</li>
+<li><code>productName</code> String (可选) - 默认为 <code>Electron</code>.</li>
+<li><code>autoSubmit</code> Boolean - 是否自动提交.
+默认为 <code>true</code>.</li>
+<li><code>ignoreSystemCrashHandler</code> Boolean - 默认为 <code>false</code>.</li>
+<li><code>extra</code> Object - 一个你可以定义的对象，附带在崩溃报告上一起发送 . 只有字符串属性可以被正确发送，不支持嵌套对象.</li>
+</ul>
+</li>
+</ul>
+<p>只可以在使用其它 <code>crashReporter</code> APIs 之前使用这个方法.</p>
+<p><strong>注意:</strong> 在 OS X, Electron 使用一个新的 <code>crashpad</code> 客户端, 与 Windows 和 Linux 的 <code>breakpad</code> 不同. 为了开启崩溃点搜集，你需要在主进程和其它每个你需要搜集崩溃报告的渲染进程中调用  <code>crashReporter.start</code> API 来初始化 <code>crashpad</code>.</p>
+<h3><code>crashReporter.getLastCrashReport()</code></h3>
+<p>返回最后一个崩溃报告的日期和 ID.如果没有过崩溃报告发送过来，或者还没有开始崩溃报告搜集，将返回 <code>null</code> .</p>
+<h3><code>crashReporter.getUploadedReports()</code></h3>
+<p>返回所有上载的崩溃报告，每个报告包含了上载日期和 ID.</p>
+<h2>crash-reporter Payload</h2>
+<p>崩溃报告将发送下面的数据给 <code>POST</code> 型的 <code>提交 URL</code> :</p>
+<ul>
+<li><code>ver</code> String - Electron 版本.</li>
+<li><code>platform</code> String - 例如 'win32'.</li>
+<li><code>process_type</code> String - 例如 'renderer'.</li>
+<li><code>guid</code> String - 例如 '5e1286fc-da97-479e-918b-6bfb0c3d1c72'</li>
+<li><code>_version</code> String - <code>package.json</code> 版本.</li>
+<li><code>_productName</code> String - <code>crashReporter</code> <code>options</code>
+  对象中的产品名字.</li>
+<li><code>prod</code> String - 基础产品名字. 这种情况为 Electron.</li>
+<li><code>_companyName</code> String - <code>crashReporter</code> <code>options</code>
+  对象中的公司名字.</li>
+<li><code>upload_file_minidump</code> File - 崩溃报告为文件.</li>
+<li><code>crashReporter</code> 中的 <code>extra</code> 对象的所有等级和一个属性.
+  <code>options</code> object</li>
+</ul>

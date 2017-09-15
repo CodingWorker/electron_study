@@ -1,0 +1,34 @@
+<h1>进程</h1>
+<p>Electron 中的 <code>process</code> 对象 与 upstream node 中的有以下的不同点:</p>
+<ul>
+<li><code>process.type</code> String - 进程类型, 可以是 <code>browser</code> (i.e. main process)
+  或 <code>renderer</code>.</li>
+<li><code>process.versions['electron']</code> String - Electron的版本.</li>
+<li><code>process.versions['chrome']</code> String - Chromium的版本.</li>
+<li><code>process.resourcesPath</code> String - JavaScript源代码路径.</li>
+<li><code>process.mas</code> Boolean - 在Mac App Store 创建, 它的值为 <code>true</code>, 在其它的地方值为 <code>undefined</code>.</li>
+</ul>
+<h2>事件</h2>
+<h3>事件: 'loaded'</h3>
+<p>在Electron已经加载了其内部预置脚本和它准备加载主进程或渲染进程的时候触发.</p>
+<p>当node被完全关闭的时候，它可以被预加载脚本使用来添加(原文: removed)与node无关的全局符号来回退到全局范围:</p>
+<p><code>js
+// preload.js
+var _setImmediate = setImmediate;
+var _clearImmediate = clearImmediate;
+process.once('loaded', function() {
+  global.setImmediate = _setImmediate;
+  global.clearImmediate = _clearImmediate;
+});</code></p>
+<h2>属性</h2>
+<h3><code>process.noAsar</code></h3>
+<p>设置它为 <code>true</code> 可以使 <code>asar</code> 文件在node的内置模块中实效.</p>
+<h2>方法</h2>
+<p><code>process</code> 对象有如下方法:</p>
+<h3><code>process.hang()</code></h3>
+<p>使当前进程的主线成挂起.</p>
+<h3><code>process.setFdLimit(maxDescriptors)</code> <em>OS X</em> <em>Linux</em></h3>
+<ul>
+<li><code>maxDescriptors</code> Integer</li>
+</ul>
+<p>设置文件描述符软限制于 <code>maxDescriptors</code> 或硬限制与os, 无论它是否低于当前进程.</p>

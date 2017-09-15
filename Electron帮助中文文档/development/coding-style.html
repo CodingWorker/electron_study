@@ -1,0 +1,15 @@
+<h1>编码规范</h1>
+<p>以下是 Electron 项目的编码规范。</p>
+<h2>C++ 和 Python</h2>
+<p>对于 C++ 和 Python，我们遵循 Chromium 的<a href="http://www.chromium.org/developers/coding-style">编码规范</a>。你可以使用 <code>script/cpplint.py</code> 来检验文件是否符合要求。</p>
+<p>我们目前使用的 Pyhton 版本是 Python 2.7。</p>
+<p>C++ 代码中用到了许多 Chromium 中的接口和数据类型，所以希望你能熟悉它们。Chromium  中的<a href="https://www.chromium.org/developers/coding-style/important-abstractions-and-data-structures">重要接口和数据结构</a>就是一篇不错的入门文档，里面提到了一些特殊类型、域内类型（退出作用域时自动释放内存）、日志机制，等等。</p>
+<h2>CoffeeScript</h2>
+<p>对于 CoffeeScript，我们遵循 GitHub 的<a href="https://github.com/styleguide/javascript">编码规范</a> 及以下规则:</p>
+<ul>
+<li>文件<strong>不要</strong>以换行符结尾，我们要遵循 Google 的编码规范。</li>
+<li>文件名使用 <code>-</code> 而不是 <code>_</code> 来连接单词，比如 <code>file-name.coffee</code> 而不是 <code>file_name.coffee</code>，这是沿用 <a href="https://github.com/github/atom">github/atom</a> 模块的命名方式（<code>module-name</code>）。这条规则仅适用于 <code>.coffee</code> 文件。</li>
+</ul>
+<h2>API 命名</h2>
+<p>当新建一个 API 时，我们倾向于使用 getters 和 setters 而不是 jQuery 单函数的命名方式，比如 <code>.getText()</code> 和 <code>.setText(text)</code>
+ 而不是 <code>.text([text])</code>。这里有关于该规则的<a href="https://github.com/atom/electron/issues/46">讨论记录</a>。</p>
