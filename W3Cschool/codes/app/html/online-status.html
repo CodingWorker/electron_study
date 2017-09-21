@@ -1,0 +1,21 @@
+<html>
+
+<head></head>
+
+<body>
+
+</body>
+<script>
+    window.onload = function() {
+        var alertOnLineStatus = function() {
+            alert(navigator.onLine ? 'online' : 'offline');
+        }
+
+        window.addEventListener('online', alertOnLineStatus);
+        window.addEventListener('offline', alertOnLineStatus);
+
+        alertOnLineStatus();
+    }
+</script>
+
+</html>

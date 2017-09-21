@@ -1,0 +1,23 @@
+<html>
+
+<head>
+    <title>my electron app</title>
+    <script>
+        window.$ = window.JQuey = require('../public/common/js/jquery-3.2.1.min.js');
+    </script>
+</head>
+
+<body>
+
+    <script>
+        $(function() {
+            console.log('import jquery correctly');
+            const remote = require('electron').remote;
+            console.log(remote);
+            console.log(remote.app.getVersion());
+            console.log(remote.app.getName());
+        });
+    </script>
+</body>
+
+</html>

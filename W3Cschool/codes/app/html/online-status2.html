@@ -1,0 +1,19 @@
+<html>
+
+<head></head>
+
+<body>
+
+    <script>
+        window.onload = function() {
+            var ipc = require('electron').ipc;
+            var updateOnlineStatus = function() {
+                ipc.send('online-status-changed', navigator.onLine ? 'online' : 'offline');
+            };
+
+            updateOnlineStatus();
+        }
+    </script>
+</body>
+
+</html>

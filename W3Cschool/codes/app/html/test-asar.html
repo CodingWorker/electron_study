@@ -1,0 +1,21 @@
+<html>
+
+<head>
+    <title>测试 asar文件读取</title>
+    <script>
+        window.$ = window.JQuery = require('../public/common/js/jquery-3.2.1.min.js');
+    </script>
+</head>
+
+<body>
+    <script>
+        $(function() {
+            let filePath = '../../app.asar/main.js';
+            $.get(filePath, (data) => {
+                console.log(data);
+            });
+        });
+    </script>
+</body>
+
+</html>

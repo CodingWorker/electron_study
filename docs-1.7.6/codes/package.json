@@ -1,0 +1,21 @@
+{
+    "name": "my-app",
+    "version": "1.0.0",
+    "description": "my-study-simple-proj",
+    "main": "app/main.js",
+    "dependencies": {
+        "electron-prebuilt": "^0.37.3"
+    },
+    "devDependencies": {
+        "asar": "^0.13.0",
+        "electron": "^1.7.6",
+        "electron-prebuilt": "^0.37.3"
+    },
+    "scripts": {
+        "test": "hello",
+        "start": "electron .",
+        "packager": "electron-packager ./app my-app --all --out ./OutApp --version 0.37.3 --overwrite --icon=./app/img/icon/icon.ico"
+    },
+    "author": "CodingWorker",
+    "license": "MIT"
+}
