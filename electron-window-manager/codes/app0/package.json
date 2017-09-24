@@ -1,0 +1,8 @@
+{
+  "name": "my-app0",
+  "version": "1.0.0",
+  "main": "./main.js",
+  "dependencies": {
+    "electron-window-manager": "^1.0.4"
+  }
+}
